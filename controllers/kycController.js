@@ -18,8 +18,12 @@ const kyc = async (req, res) => {
     where: { phone: "0" + phoneNumber.substr(-10) },
     defaults: { phone: "0" + phoneNumber.substr(-10) },
   });
-  let message;
 
+  if(starting){
+    step = starting.step
+    stage = starting.stage
+  }
+  let message;
   try {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "kyc") {
       stage = 0
