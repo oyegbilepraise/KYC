@@ -21,7 +21,9 @@ const kyc = async (req, res) => {
   let message;
 
   try {
-    if (step == 0 && stage == 0 && response.trim().toLowerCase() === "kyc") {
+    if (step == 0 && stage == 0 && response.trim().toLowerCase() == "kyc") {
+      stage = 0
+      step = 0
       step++;
       message =
         "This is a verification tool for creditclan. \nKindly enter customer's phone number";
