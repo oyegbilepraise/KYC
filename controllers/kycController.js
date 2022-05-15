@@ -8,7 +8,7 @@ let stage = 0;
 let sub_step = 0;
 
 let data = {
-  name: "Praise",
+  name: "Oyegbile Praise",
   address: "Lorem Ipsum Dolor",
 };
 
