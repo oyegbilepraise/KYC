@@ -1,19 +1,18 @@
 const db = require("../models");
 let a = require("dotenv").config();
 const interactive = require("../helpers/responses");
+const axios = require("axios");
 
 const KYC = db.kyc;
 let step = 0;
 let stage = 0;
 let sub_step = 0;
 
-let data = {
-  name: "Oyegbile Praise",
-  address: "Lorem Ipsum Dolor",
-};
+let data;
 
 const kyc = async (req, res) => {
   let { phoneNumber, response } = req.body;
+
   let [starting, created] = await KYC.findOrCreate({
     where: { phone: "0" + phoneNumber.substr(-10) },
     defaults: { phone: "0" + phoneNumber.substr(-10) },
@@ -38,7 +37,13 @@ const kyc = async (req, res) => {
         { where: { id: starting.id } }
       );
     } else if (step == 1 && stage == 0) {
-      let messages = `Here is the detail of the customer \nName: ${data.name} \nAddress: ${data.address} \n\nDoes the above address matches or related property visited?`;
+      let phone = "0" + response.substr(-10)
+      
+      await axios.get(`https://sellbackend.creditclan.com/merchantclan/public/index.php/api/whatsapp/customer?phone=${phone}`).then(res => {
+        data = res.data.data
+      })
+
+      let messages = `Here is the detail of the customer \nName: ${data.whatsapp_name} \nAddress: ${data.address} \n\nDoes the above address matches or related property visited?`;
 
       message = await interactive.productsButtons(
         messages,
@@ -148,15 +153,9 @@ const kyc = async (req, res) => {
       }
     } else if (step == 3 && stage == 2) {
       if (sub_step == 3) {
-        await KYC.update({ address: response }, { where: { id: starting.id } });
-        message = "Send Location of the new address";
         step++;
-        await KYC.update(
-          {
-            step,
-          },
-          { where: { id: starting.id } }
-        );
+        await KYC.update({ address: response, step }, { where: { id: starting.id } });
+        message = "Send Location of the new address";
       } else if ((sub_step = 4)) {
         message = "Send your location";
         step++;
@@ -168,48 +167,41 @@ const kyc = async (req, res) => {
         );
       }
     } else if (step == 4 && stage == 2 && sub_step == 3) {
-      await KYC.update({ location: response }, { where: { id: starting.id } });
+      step++;
+      await KYC.update({ location: response, step }, { where: { id: starting.id } });
       message = "Take photo of the property";
-      step++;
-      await KYC.update(
-        {
-          step,
-        },
-        { where: { id: starting.id } }
-      );
     } else if (step == 5 && stage == 2 && sub_step == 3) {
-      await KYC.update({ picture: response }, { where: { id: starting.id } });
+      step++;
+      await KYC.update({ picture: response, step }, { where: { id: starting.id } });
       message = "Provide closest landmark";
-      step++;
-      await KYC.update(
-        {
-          step,
-        },
-        { where: { id: starting.id } }
-      );
     } else if (step == 6 && stage == 2 && sub_step == 3) {
-      await KYC.update({ landmark: response }, { where: { id: starting.id } });
+      step++;
+      await KYC.update({ landmark: response, step }, { where: { id: starting.id } });
       message = "Take photo of the landmark";
-      step++;
-      await KYC.update(
-        {
-          step,
-        },
-        { where: { id: starting.id } }
-      );
     } else if (step == 7 && stage == 2 && sub_step == 3) {
-      await KYC.update(
-        { landmark_picture: response },
-        { where: { id: starting.id } }
-      );
-      message = await KYC.findOne({ where: { id: starting.id } });
       step++;
       await KYC.update(
-        {
-          step,
-        },
+        { landmark_picture: response, step },
         { where: { id: starting.id } }
       );
+      let summary = await KYC.findOne({ where: { id: starting.id } });
+
+      let messages = `Address: ${summary.address} \n`
+      messages += `Landmark: ${summary.landmark} \n`
+
+      message = await interactive.RestaurantsDetails(
+        "This is the sumary",
+        messages,
+        summary.picture,
+        [
+          { id: "2", title: "Edit" },
+          { id: "1", title: "save" },
+        ],
+        req.body.provider
+      );
+
+
+      
     } else if (step == 1 && stage == 2) {
       if (response == 1) {
         let messages = "Customer has new address";
@@ -308,8 +300,9 @@ const kyc = async (req, res) => {
           { where: { id: starting.id } }
         );
       } else {
+        step++;
         await KYC.update(
-          { other_name: response },
+          { other_name: response, step },
           { where: { id: starting.id } }
         );
         let messages = "Select the type of property the customer reside";
@@ -320,13 +313,6 @@ const kyc = async (req, res) => {
           { id: "4", title: "Office Building" },
           { id: "5", title: "Bungalow" },
         ]);
-        step++;
-        await KYC.update(
-          {
-            step,
-          },
-          { where: { id: starting.id } }
-        );
       }
     } else if (step == 4 && stage == 1 && sub_step == 1) {
 
@@ -355,35 +341,17 @@ const kyc = async (req, res) => {
         { where: { id: starting.id } }
       );
     } else if (step == 5 && stage == 1 && sub_step == 1) {
-      await KYC.update({ location: response }, { where: { id: starting.id } });
+      step++;
+      await KYC.update({ location: response, step }, { where: { id: starting.id } });
       message = "Kindly take picture of the house";
-      step++;
-      await KYC.update(
-        {
-          step,
-        },
-        { where: { id: starting.id } }
-      );
     } else if (step == 6 && stage == 1 && sub_step == 1) {
-      await KYC.update({ picture: response }, { where: { id: starting.id } });
+      step++;
+      await KYC.update({ picture: response, step }, { where: { id: starting.id } });
       message = "Provide a landmark closest to the address";
-      step++;
-      await KYC.update(
-        {
-          step,
-        },
-        { where: { id: starting.id } }
-      );
     } else if (step == 7 && stage == 1 && sub_step == 1) {
-      await KYC.update({ landmark: response }, { where: { id: starting.id } });
-      message = "kindly take picture of the landmark";
       step++;
-      await KYC.update(
-        {
-          step,
-        },
-        { where: { id: starting.id } }
-      );
+      await KYC.update({ landmark: response, step }, { where: { id: starting.id } });
+      message = "kindly take picture of the landmark";
     } else if (step == 8 && stage == 1 && sub_step == 1) {
       step++;
       await KYC.update(
@@ -393,11 +361,10 @@ const kyc = async (req, res) => {
 
       let summary = await KYC.findOne({ where: { id: starting.id } });
 
-      let messages = `Other Name: ${summary.other_name} \n`
+      let messages =`Other Name: ${summary.other_name} \n`
       messages+= `Phone: ${summary.phone} \n`
-      messages+= `Landmark ${summary.landmark} \n`
-      messages+= `House Type ${summary.house_type} \n`
-
+      messages+= `Landmark: ${summary.landmark} \n`
+      messages+= `House Type: ${summary.house_type} \n`
 
       message = await interactive.RestaurantsDetails(
         "This is the sumary",
@@ -448,15 +415,9 @@ const kyc = async (req, res) => {
         message = "Thank you. your exercise has been completed";
       }
     } else if (step == 4 && stage == 1 && sub_step == 0) {
-      await KYC.update({ location: response }, { where: { id: starting.id } });
-      message = "Take Picture of estate entrance";
       step++;
-      await KYC.update(
-        {
-          step,
-        },
-        { where: { id: starting.id } }
-      );
+      await KYC.update({ location: response, step }, { where: { id: starting.id } });
+      message = "Take Picture of estate entrance";
     } else if (step == 5 && stage == 1 && sub_step == 0) {
       await KYC.update({ picture: response }, { where: { id: starting.id } });
       message = "Thank you. your exercise has been completed";
