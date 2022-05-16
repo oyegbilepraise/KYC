@@ -19,15 +19,15 @@ const kyc = async (req, res) => {
     defaults: { phone: "0" + phoneNumber.substr(-10) },
   });
 
-  if(starting){
-    step = starting.step
-    stage = starting.stage
+  if (starting) {
+    step = starting.step;
+    stage = starting.stage;
   }
   let message;
   try {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "kyc") {
-      stage = 0
-      step = 0
+      stage = 0;
+      step = 0;
       step++;
       message =
         "This is a verification tool for creditclan. \nKindly enter customer's phone number";
@@ -329,8 +329,21 @@ const kyc = async (req, res) => {
         );
       }
     } else if (step == 4 && stage == 1 && sub_step == 1) {
+
+      let newRes;
+      if(response == 1){
+        newRes = '1 Storey'
+      } else if(response == 2){
+        newRes = '2 Storey'
+      } else if(response == 3){
+        newRes = 'More than 2 Storey'
+      } else if(response == 4){
+        newRes = 'Office Building'
+      } else if(response == 5){
+        newRes = 'Bungalow'
+      }
       await KYC.update(
-        { house_type: response },
+        { house_type: newRes },
         { where: { id: starting.id } }
       );
       message = "Share location of the property";
@@ -372,17 +385,29 @@ const kyc = async (req, res) => {
         { where: { id: starting.id } }
       );
     } else if (step == 8 && stage == 1 && sub_step == 1) {
-      await KYC.update(
-        { landmark_picture: response },
-        { where: { id: starting.id } }
-      );
-      message = await KYC.findOne({ where: { id: starting.id } });
       step++;
       await KYC.update(
-        {
-          step,
-        },
+        { landmark_picture: response, step },
         { where: { id: starting.id } }
+      );
+
+      let summary = await KYC.findOne({ where: { id: starting.id } });
+
+      let messages = `Other Name: ${summary.other_name} \n`
+      messages+= `Phone: ${summary.phone} \n`
+      messages+= `Landmark ${summary.landmark} \n`
+      messages+= `House Type ${summary.house_type} \n`
+
+
+      message = await interactive.RestaurantsDetails(
+        "This is the sumary",
+        messages,
+        summary.picture,
+        [
+          { id: "2", title: "Edit" },
+          { id: "1", title: "save" },
+        ],
+        req.body.provider
       );
     } else if (step == 2 && stage == 1 && sub_step == 0) {
       if (response == 1) {
