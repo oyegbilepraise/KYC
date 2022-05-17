@@ -433,7 +433,44 @@ const kyc = async (req, res) => {
           ],
           req.body.provider
         );
-      } else if (step == 2 && stage == 1 && sub_step == 0) {
+      } else if(step == 9 && stage == 1 && sub_step == 1){
+        if(response == 1){
+          message = "Thank you. your exercise has been completed";
+        } else if(response == 2){
+          message = "*[1].* Customer's other name \n"
+          message += "*[2].* Property Type \n"
+          message += "*[3].* Property Location \n"
+          message += "*[4].* House Picture \n"
+          message += "*[5].* Landmark \n"
+          message += "*[6]*. Landmark Picture"
+        }
+      } else if(step == 10 && stage == 1 && sub_step == 1){
+        if(response == 1){
+          message = "Provide customer's other name"
+        } else if(response == 2){
+          let messages = "Select the type of property the customer reside";
+          message = await interactive.List(messages, [
+            { id: "1", title: "1 Storey" },
+            { id: "2", title: "2 Storey" },
+            { id: "3", title: "More than 2 Storey" },
+            { id: "4", title: "Office Building" },
+            { id: "5", title: "Bungalow" },
+          ]);
+        } else if(response == 3){
+          message = 'Send the location ofthe property'
+        } else if(response == 4){
+          message = 'Take Property Picture'
+        } else if(response == 5){
+          message = 'Provide the landmark closest to the address'
+        } else if(response == 6){
+          message = 'Kindly take picture of the landmark'
+        }
+      }
+      
+      
+      
+      
+      else if (step == 2 && stage == 1 && sub_step == 0) {
         if (response == 1) {
           let messages = "I confirmed customer lives in the estate";
           message = await interactive.productsButtons(
