@@ -7,7 +7,7 @@ const KYC = db.kyc;
 let step = 0;
 let stage = 0;
 let sub_step = 0;
-let phone = "08067710067";
+let phone = "07030402622";
 let data;
 
 const kyc = async (req, res) => {
