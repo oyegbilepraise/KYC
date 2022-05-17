@@ -38,7 +38,6 @@ const kyc = async (req, res) => {
       );
     } else if (step == 1 && stage == 0) {
       let phone = "0" + response.substr(-10)
-      
       await axios.get(`https://sellbackend.creditclan.com/merchantclan/public/index.php/api/whatsapp/customer?phone=${phone}`).then(res => {
         data = res.data.data
       })
@@ -177,7 +176,7 @@ const kyc = async (req, res) => {
     } else if (step == 6 && stage == 2 && sub_step == 3) {
       step++;
       await KYC.update({ landmark: response, step }, { where: { id: starting.id } });
-      message = "Take photo of the landmark";
+      message = "Take picture of the landmark";
     } else if (step == 7 && stage == 2 && sub_step == 3) {
       step++;
       await KYC.update(
@@ -199,10 +198,35 @@ const kyc = async (req, res) => {
         ],
         req.body.provider
       );
-
-
-      
-    } else if (step == 1 && stage == 2) {
+     
+    } else if (step == 8 && stage == 2 && sub_step == 3) {
+      if(response == 1){
+        message = "Thank you. your exercise has been completed";
+        step++;
+        await KYC.update(
+          {
+            step,
+          },
+          { where: { id: starting.id } }
+        );
+      } else if(response == 2){
+        message = '*[1]*. Enter new address \n'
+        message += '*[2]*.  Location'
+        message += '*[3]*.  Property Picture'
+        message += '*[4]*. Landmark'
+        message += '*[5]*. Landmark Picture'
+        step++;
+        await KYC.update(
+          {
+            step,
+          },
+          { where: { id: starting.id } }
+        );
+      }
+    }
+    
+    
+    else if (step == 1 && stage == 2) {
       if (response == 1) {
         let messages = "Customer has new address";
         message = await interactive.productsButtons(
