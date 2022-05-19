@@ -7,7 +7,7 @@ const KYC = db.kyc;
 let step = 0;
 let stage = 0;
 let sub_step = 0;
-let phone = "2348067710067"; 
+let phone = "2348067710067";
 let data;
 
 const kyc = async (req, res) => {
@@ -433,21 +433,21 @@ const kyc = async (req, res) => {
           ],
           req.body.provider
         );
-      } else if(step == 9 && stage == 1 && sub_step == 1){
-        if(response == 1){
+      } else if (step == 9 && stage == 1 && sub_step == 1) {
+        if (response == 1) {
           message = "Thank you. your exercise has been completed";
-        } else if(response == 2){
-          message = "*[1].* Customer's other name \n"
-          message += "*[2].* Property Type \n"
-          message += "*[3].* Property Location \n"
-          message += "*[4].* House Picture \n"
-          message += "*[5].* Landmark \n"
-          message += "*[6]*. Landmark Picture"
+        } else if (response == 2) {
+          message = "*[1].* Customer's other name \n";
+          message += "*[2].* Property Type \n";
+          message += "*[3].* Property Location \n";
+          message += "*[4].* House Picture \n";
+          message += "*[5].* Landmark \n";
+          message += "*[6]*. Landmark Picture";
         }
-      } else if(step == 10 && stage == 1 && sub_step == 1){
-        if(response == 1){
-          message = "Provide customer's other name"
-        } else if(response == 2){
+      } else if (step == 10 && stage == 1 && sub_step == 1) {
+        if (response == 1) {
+          message = "Provide customer's other name";
+        } else if (response == 2) {
           let messages = "Select the type of property the customer reside";
           message = await interactive.List(messages, [
             { id: "1", title: "1 Storey" },
@@ -456,21 +456,16 @@ const kyc = async (req, res) => {
             { id: "4", title: "Office Building" },
             { id: "5", title: "Bungalow" },
           ]);
-        } else if(response == 3){
-          message = 'Send the location ofthe property'
-        } else if(response == 4){
-          message = 'Take Property Picture'
-        } else if(response == 5){
-          message = 'Provide the landmark closest to the address'
-        } else if(response == 6){
-          message = 'Kindly take picture of the landmark'
+        } else if (response == 3) {
+          message = "Send the location ofthe property";
+        } else if (response == 4) {
+          message = "Take Property Picture";
+        } else if (response == 5) {
+          message = "Provide the landmark closest to the address";
+        } else if (response == 6) {
+          message = "Kindly take picture of the landmark";
         }
-      }
-      
-      
-      
-      
-      else if (step == 2 && stage == 1 && sub_step == 0) {
+      } else if (step == 2 && stage == 1 && sub_step == 0) {
         if (response == 1) {
           let messages = "I confirmed customer lives in the estate";
           message = await interactive.productsButtons(
@@ -521,163 +516,56 @@ const kyc = async (req, res) => {
       }
       return res.status(200).json({ message });
     } else {
-      return res.status(200).json('Oops!, You"re not allowed to use this service')
+      return res
+        .status(200)
+        .json('Oops!, You"re not allowed to use this service');
     }
   } catch (error) {
     res.status(500).json({ error });
   }
 };
 
-// "{\"latitude\":6.428798249999999,\"longitude\":3.4361785}"
-// {latitude:6.428798249999999,longitude:3.4361785}
-
-// {"latitude":"6.428798249999999","longitude":"3.4361785"}
-// {"latitude":'6.428798249999999',"longitude":'3.4361785'}
-
-// const kyc = async (req, res) => {
-//   let { phoneNumber, response } = req.body;
+// const customer_kyc = async (req, res) => {
+//   const { phoneNumber } = req.body;
 //   try {
-//     let [starting, created] = await KYC.findOrCreate({
-//       where: { phone: "0" + phoneNumber.substr(-10) },
-//       defaults: { phone: "0" + phoneNumber.substr(-10) },
-//     });
-//     let message;
-//     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "kyc") {
-//       step++;
-//       message =
-//         "This is a verification tool for creditclan. \nKindly enter customer's phone number";
-//     } else if (step == 1 && stage == 0) {
-//       let messages = `Here is the detail of the customer \nName: ${data.name} \nAddress: ${data.address} \n\nDoes the above address matches or related property visited?`;
-
+//     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "cc-kyc"){
+//       let fetch = await axios.post(
+//         "https://mobile.creditclan.com/api/v3/customer/check/details",
+//         { phone: phoneNumber },
+//         {
+//           headers: {
+//             "x-api-key":
+//               "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
+//           },
+//         }
+//       );
+  
+//       let newFetch = await axios.post(
+//         "https://mobile.creditclan.com/api/v3/user/detailsbyid",
+//         { token: fetch.data.token },
+//         {
+//           headers: {
+//             "x-api-key":
+//               "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
+//           },
+//         }
+//       );
+  
 //       message = await interactive.productsButtons(
 //         messages,
 //         [
-//           { id: "2", title: "No" },
-//           { id: "1", title: "Yes" },
+//           { id: "2", title: "Level 2" },
+//           { id: "1", title: "Level 1" },
 //         ],
 //         req?.body?.provider
 //       );
-//       step++;
-//     } else if (response == 1 && step == 2 && stage == 0) {
-//       stage = 1;
-//       await KYC.update({ stage }, { where: { id: starting.id } });
-//       step = 0;
-//       let messages =
-//         "Do you require access to enter if address is in an estate";
-//       message = await interactive.productsButtons(
-//         messages,
-//         [
-//           { id: "2", title: "No" },
-//           { id: "1", title: "Yes" },
-//         ],
-//         req?.body?.provider
-//       );
-//       step++;
-//     } else if (response == 1 && stage == 1 && step == 1) {
-//       let messages = "I confirmed address in the estate";
-//       message = await interactive.productsButtons(
-//         messages,
-//         [
-//           { id: "2", title: "No" },
-//           { id: "1", title: "Yes" },
-//         ],
-//         req?.body?.provider
-//       );
-//       step++;
-//     } else if (response == 1 && stage == 1 && step == 2 && sub_step == 0) {
-//       let messages = "I confirmed customer lives in the estate";
-//       message = await interactive.productsButtons(
-//         messages,
-//         [
-//           { id: "2", title: "No" },
-//           { id: "1", title: "Yes" },
-//         ],
-//         req?.body?.provider
-//       );
-//       step++;
-//     } else if (response == 1 && stage == 1 && step == 3 && sub_step == 0) {
-//       message = await interactive.productsButtons(
-//         `Share location of the estate📍`,
-//         [{ id: "1", title: "Show me how" }],
-//         req.body.provider
-//       );
-//       step++;
-//     } else if (response && stage == 1 && step == 4 && sub_step == 0) {
-//       await KYC.update({
-//         location: response,
-//       });
-//       message = "Take Picture of estate entrance";
-//       step++;
-//     } else if (stage == 1 && step == 5 && sub_step == 0) {
-//       message = "Thank you. your exercise has been completed";
-//     } else if (response == 2 && stage == 1 && step == 2 && sub_step == 0) {
-//       message = "Thank you. your exercise has been completed";
-//     } else if (response == 2 && step == 1 && stage == 1) {
-//       sub_step = 1;
-//       let messages = "I confirmed the name from a neighbor";
-//       message = await interactive.productsButtons(
-//         messages,
-//         [
-//           { id: "2", title: "No" },
-//           { id: "1", title: "Yes" },
-//         ],
-//         req?.body?.provider
-//       );
-//       step++;
-//     } else if (response == 1 && step == 2 && stage == 1 && sub_step == 1) {
-//       let messages = "Customer has another name";
-//       message = await interactive.productsButtons(
-//         messages,
-//         [
-//           { id: "2", title: "No" },
-//           { id: "1", title: "Yes" },
-//         ],
-//         req?.body?.provider
-//       );
-//       step++;
-//     } else if (response == 1 && step == 3 && stage == 1 && sub_step == 1) {
-//       message = "Provide the customer other name";
-//       step++;
-//     } else if (response == 2 && step == 3 && stage == 1 && sub_step == 1) {
-//       let messages = "Select the type of property the customer reside";
-//       message = await interactive.List(messages, [
-//         { id: "1", title: "1 Storey" },
-//         { id: "2", title: "2 Storey" },
-//         { id: "3", title: "More than 2 Storey" },
-//         { id: "4", title: "Office Building" },
-//         { id: "5", title: "Bungalow" },
-//       ]);
-//       step++;
-//     }
-//      else if (response == 2 && step == 2 && stage == 0) {
-//       stage = 2;
-//       await KYC.update({ stage }, { where: { id: starting.id } });
-//       step = 0;
-//       message = "I confirmed the name through a neighbor or the customer";
+  
+//       res.status(200).json(newFetch.data);
 //     }
 
-//     // if (step == 4 && stage == 1 && sub_step == 1) {
-//     //   await KYC.update({ house_type: response });
-//     //   message = await interactive.productsButtons(
-//     //     `Share location of the property📍`,
-//     //     [{ id: "1", title: "Show me how" }],
-//     //     req.body.provider
-//     //   );
-//     //   step++;
-//     // }
-
-//     let upd = await KYC.update(
-//       {
-//         step,
-//       },
-//       { where: { id: starting.id } }
-//     );
-
-//     console.log(step, stage);
-
-//     return res.status(200).json({ message });
 //   } catch (error) {
-//     res.status(500).json(error);
+//     console.log(error);
+//     res.status(500).json({ error });
 //   }
 // };
 

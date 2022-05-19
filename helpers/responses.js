@@ -155,6 +155,7 @@ class Responses {
   }
 
   static async productsButtons(info, button, provider) {
+    console.log(button);
     let final_button = [];
 
     button.forEach((element) => {
