@@ -21,31 +21,38 @@ const customer_kyc = async (req, res) => {
         }
       );
 
-      let newFetch = await axios.post(
-        "https://mobile.creditclan.com/api/v3/user/detailsbyid",
-        { token: fetch.data.token },
-        {
-          headers: {
-            "x-api-key":
-              "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
-          },
-        }
-      );
+      if (fetch.data.status === true) {
+        let newFetch = await axios.post(
+          "https://mobile.creditclan.com/api/v3/user/detailsbyid",
+          { token: fetch.data.token },
+          {
+            headers: {
+              "x-api-key":
+                "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
+            },
+          }
+        );
 
-      await axios.post("https://ccendpoints.herokuapp.com/api/v2/create-kyc", {
-        phone: phoneNumber,
-      });
+        await axios.post(
+          "https://ccendpoints.herokuapp.com/api/v2/create-kyc",
+          {
+            phone: phoneNumber,
+          }
+        );
 
-      message = await interactive.productsButtons(
-        "Kindly Choose from the option below",
-        [
-          { id: "2", title: "Level 2" },
-          { id: "1", title: "Level 1" },
-        ],
-        req?.body?.provider
-      );
-      step++;
-      res.status(200).json(message);
+        message = await interactive.productsButtons(
+          "Kindly Choose from the option below",
+          [
+            { id: "2", title: "Level 2" },
+            { id: "1", title: "Level 1" },
+          ],
+          req?.body?.provider
+        );
+        step++;
+        res.status(200).json({ message });
+      } else {
+        res.status(200).json({ message: fetch.data.message });
+      }
     } else if (step == 1 && stage == 0) {
       if (response == 1) {
         stage = 1;
@@ -123,19 +130,49 @@ const customer_kyc = async (req, res) => {
         step++;
       }
     } else if (step == 6 && stage == 1) {
-        await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
-            phone: phoneNumber,
-            Gender: response,
-          });
+      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
+        phone: phoneNumber,
+        profile_picture: response,
+      });
       res
         .status(200)
         .json("Thank you. We will review your request and get back to you.");
     } else if (step == 2 && stage == 2) {
       if (response == 1) {
+        let message = "Kindly provide your BVN.";
+        res.status(200).json(message);
+        step++;
       }
+    } else if (step == 3 && stage == 2) {
+      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
+        phone: phoneNumber,
+        bvn: response,
+      });
+      let message = "Kindly provide your NIN.";
+      res.status(200).json(message);
+      step++;
+    } else if (step == 4 && stage == 2) {
+      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
+        phone: phoneNumber,
+        nin: response,
+      });
+      let message = await interactive.productsButtons(
+        "Kindly enter your signature",
+        [{ id: "1", title: "Skip" }],
+        req?.body?.provider
+      );
+      res.status(200).json(message);
+      step++;
+    } else if (step == 5 && stage == 2) {
+      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
+        phone: phoneNumber,
+        signature: response,
+      });
+      res
+        .status(200)
+        .json("Thank you. We will review your request and get back to you.");
     }
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error });
   }
 };

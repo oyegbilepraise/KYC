@@ -525,48 +525,4 @@ const kyc = async (req, res) => {
   }
 };
 
-// const customer_kyc = async (req, res) => {
-//   const { phoneNumber } = req.body;
-//   try {
-//     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "cc-kyc"){
-//       let fetch = await axios.post(
-//         "https://mobile.creditclan.com/api/v3/customer/check/details",
-//         { phone: phoneNumber },
-//         {
-//           headers: {
-//             "x-api-key":
-//               "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
-//           },
-//         }
-//       );
-  
-//       let newFetch = await axios.post(
-//         "https://mobile.creditclan.com/api/v3/user/detailsbyid",
-//         { token: fetch.data.token },
-//         {
-//           headers: {
-//             "x-api-key":
-//               "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
-//           },
-//         }
-//       );
-  
-//       message = await interactive.productsButtons(
-//         messages,
-//         [
-//           { id: "2", title: "Level 2" },
-//           { id: "1", title: "Level 1" },
-//         ],
-//         req?.body?.provider
-//       );
-  
-//       res.status(200).json(newFetch.data);
-//     }
-
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ error });
-//   }
-// };
-
 module.exports = { kyc };
