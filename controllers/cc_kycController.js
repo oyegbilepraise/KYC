@@ -253,4 +253,17 @@ const getAll = async (req, res) => {
   }
 }
 
-module.exports = { customer_kyc, getAll };
+const deleteOne = async (req, res) => {
+  const {id} = req.body
+  try{
+    let data = await KYC.destroy({
+      id
+    }) 
+
+    res.status(200).json(data)
+  } catch(error){
+    res.status(500).json({ error });
+  }
+}
+
+module.exports = { customer_kyc, getAll, deleteOne };
