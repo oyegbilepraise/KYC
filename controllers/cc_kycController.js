@@ -3,11 +3,23 @@ let a = require("dotenv").config();
 const interactive = require("../helpers/responses");
 const axios = require("axios");
 
+const KYC = db.cc_kyc;
+
 let step = 0;
 let stage = 0;
 
 const customer_kyc = async (req, res) => {
   const { phoneNumber, response } = req.body;
+
+  let [starting, created] = await KYC.findOrCreate({
+    where: { phone: "0" + phoneNumber.substr(-10) },
+    defaults: { phone: "0" + phoneNumber.substr(-10) },
+  });
+
+  if (starting) {
+    step = starting.step;
+    stage = starting.stage;
+  }
 
   let newPhone = "0" + phoneNumber.substr(-10);
 
@@ -38,13 +50,6 @@ const customer_kyc = async (req, res) => {
           }
         );
 
-        await axios.post(
-          "https://ccendpoints.herokuapp.com/api/v2/create-kyc",
-          {
-            phone: phoneNumber,
-          }
-        );
-
         message = await interactive.productsButtons(
           "Kindly Choose from the option below",
           [
@@ -53,7 +58,21 @@ const customer_kyc = async (req, res) => {
           ],
           req?.body?.provider
         );
+
+        let user = newFetch.data.data.userData.data;
         step++;
+        await KYC.update(
+          {
+            step,
+            full_name: user?.profile?.legal_name,
+            residential_address: user?.home_address?.home_address,
+            email: user.profile?.email,
+            dob: user?.profile.date_of_birth,
+            bvn: user?.profile?.bvn,
+            gender: user?.profile?.gender == 0 ? "Male" : "Female"
+          },
+          { where: { id: starting.id } }
+        );
         res.status(200).json({ message });
       } else {
         res.status(200).json({ message: fetch.data.message });
@@ -73,8 +92,15 @@ const customer_kyc = async (req, res) => {
           [{ id: "1", title: "Get Started" }],
           req?.body?.provider
         );
-        res.status(200).json(message);
         step++;
+        await KYC.update(
+          {
+            step,
+            stage,
+          },
+          { where: { id: starting.id } }
+        );
+        res.status(200).json(message);
       } else if (response == 2) {
         stage = 2;
         let messages =
@@ -90,55 +116,83 @@ const customer_kyc = async (req, res) => {
         );
         res.status(200).json(message);
         step++;
+        await KYC.update(
+          {
+            step,
+            stage,
+          },
+          { where: { id: starting.id } }
+        );
       }
     } else if (step == 2 && stage == 1) {
       if (response == 1) {
         let message = "Kindly enter your date of birth.";
         res.status(200).json(message);
         step++;
+        await KYC.update(
+          {
+            step,
+          },
+          { where: { id: starting.id } }
+        );
       }
     } else if (step == 3 && stage == 1) {
-      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
-        phone: phoneNumber,
-        DOB: response,
-      });
-      let message = "Kindly enter your gender.";
-      res.status(200).json(message);
       step++;
+      let message = "Kindly enter your gender.";
+      await KYC.update(
+        {
+          step,
+          dob: response,
+        },
+        { where: { id: starting.id } }
+      );
+      res.status(200).json(message);
     } else if (step == 4 && stage == 1) {
-      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
-        phone: phoneNumber,
-        Gender: response,
-      });
+      step++;
       let message = await interactive.productsButtons(
         "Kindly enter your email",
         [{ id: "1", title: "Skip" }],
         req?.body?.provider
       );
+      await KYC.update(
+        {
+          step,
+          gender: response,
+        },
+        { where: { id: starting.id } }
+      );
       res.status(200).json(message);
-      step++;
     } else if (step == 5 && stage == 1) {
       if (response == 1) {
         let message = "Kindly Upload your profile picture.";
         res.status(200).json(message);
         step++;
-      } else {
-        await axios.post(
-          "https://ccendpoints.herokuapp.com/api/v2/kyc/update",
+        await KYC.update(
           {
-            phone: phoneNumber,
-            Email: response,
-          }
+            step,
+          },
+          { where: { id: starting.id } }
         );
-        let message = "Kindly Upload your profile picture.";
-        res.status(200).json(message);
+      } else {
         step++;
+        let message = "Kindly Upload your profile picture.";
+        await KYC.update(
+          {
+            step,
+            email: response,
+          },
+          { where: { id: starting.id } }
+        );
+        res.status(200).json(message);
       }
     } else if (step == 6 && stage == 1) {
-      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
-        phone: phoneNumber,
-        profile_picture: response,
-      });
+      await KYC.update(
+        {
+          step: 0, stage: 0,
+          profile_picture: response,
+        },
+        { where: { id: starting.id } }
+      );
       res
         .status(200)
         .json("Thank you. We will review your request and get back to you.");
@@ -147,32 +201,40 @@ const customer_kyc = async (req, res) => {
         let message = "Kindly provide your BVN.";
         res.status(200).json(message);
         step++;
+        await KYC.update(
+          {
+            step,
+          },
+          { where: { id: starting.id } }
+        );
       }
     } else if (step == 3 && stage == 2) {
-      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
-        phone: phoneNumber,
-        bvn: response,
-      });
-      let message = "Kindly provide your NIN.";
-      res.status(200).json(message);
       step++;
+      let message = "Kindly provide your NIN.";
+      await KYC.update(
+        {
+          step,
+          bvn: response,
+        },
+        { where: { id: starting.id } }
+      );
+      res.status(200).json(message);
     } else if (step == 4 && stage == 2) {
-      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
-        phone: phoneNumber,
-        nin: response,
-      });
+      step++;
       let message = await interactive.productsButtons(
         "Kindly enter your signature",
         [{ id: "1", title: "Skip" }],
         req?.body?.provider
       );
+      await KYC.update(
+        {
+          step,
+          nin: response,
+        },
+        { where: { id: starting.id } }
+      );
       res.status(200).json(message);
-      step++;
     } else if (step == 5 && stage == 2) {
-      await axios.post("https://ccendpoints.herokuapp.com/api/v2/kyc/update", {
-        phone: phoneNumber,
-        signature: response,
-      });
       res
         .status(200)
         .json("Thank you. We will review your request and get back to you.");
@@ -182,4 +244,13 @@ const customer_kyc = async (req, res) => {
   }
 };
 
-module.exports = { customer_kyc };
+const getAll = async (req, res) => {
+  try{
+    let ress = await KYC.findAll()
+    res.status(200).json({ress})
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+}
+
+module.exports = { customer_kyc, getAll };

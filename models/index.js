@@ -26,13 +26,14 @@ sequelize
 const db = {};
 
 db.kyc = require("./kycModel")(sequelize, DataTypes);
+db.cc_kyc = require("./cc_kyc")(sequelize, DataTypes);
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.sequelize
   .sync({
-    force: true,
+    alter: true,
   })
   .then(() => {
     console.log("yes re-sync done!");
