@@ -13,6 +13,8 @@ const customer_kyc = async (req, res) => {
 
   try {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "cc-kyc") {
+      stage = 0;
+      step = 0;
       let fetch = await axios.post(
         "https://mobile.creditclan.com/api/v3/customer/check/details",
         { phone: newPhone },

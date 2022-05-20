@@ -22,6 +22,7 @@ const kyc = async (req, res) => {
     step = starting.step;
     stage = starting.stage;
   }
+  
   let message;
   try {
     if (phoneNumber == phone) {
