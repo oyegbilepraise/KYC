@@ -257,7 +257,7 @@ const deleteOne = async (req, res) => {
   const {id} = req.body
   try{
     let data = await KYC.destroy({
-      id
+      where: {id}
     }) 
 
     res.status(200).json(data)
