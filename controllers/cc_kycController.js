@@ -9,7 +9,7 @@ let stage = 0;
 const customer_kyc = async (req, res) => {
   const { phoneNumber, response } = req.body;
 
-  let newPhone = "0" + phoneNumber.substr(-10)
+  let newPhone = "0" + phoneNumber.substr(-10);
 
   try {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "cc-kyc") {
