@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 
 var corsOptions = {
-    origin: 'https://localhost:8081'
+    origin: "*"
 }
 
 // middlewaress
