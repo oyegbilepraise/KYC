@@ -61,7 +61,7 @@ const customer_kyc = async (req, res) => {
           res.status(200).json(message)
         } else{
           message = await interactive.productsButtons(
-            ` Hi, ${user?.profile?.legal_name} \n Kindly Choose from the option below`,
+            ` Hi, ${user?.profile?.legal_name} \n You're currently on KYC Level ${starting.level}\n \n Kindly Choose from the option below`,
             [
               { id: "2", title: "Level 2" },
               { id: "1", title: "Level 1" },
