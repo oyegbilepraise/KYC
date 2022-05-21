@@ -264,7 +264,7 @@ const customer_kyc = async (req, res) => {
 
 const getAll = async (req, res) => {
   try{
-    let ress = await KYC.findAll()
+    let ress = await KYC.findAll({ where: { delete: 0 }})
     res.status(200).json({ress})
   } catch (error) {
     res.status(500).json({ error });
