@@ -33,7 +33,7 @@ db.sequelize = sequelize;
 
 db.sequelize
   .sync({
-    force: true,
+    alter: true,
   })
   .then(() => {
     console.log("yes re-sync done!");
