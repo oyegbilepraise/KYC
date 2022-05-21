@@ -290,7 +290,8 @@ const deleteOne = async (req, res) => {
   try{
     let data = await KYC.update(
       {
-        delete: 1
+        delete: 1,
+        confirmed: 1
       },
       { where: { id } }
     );
