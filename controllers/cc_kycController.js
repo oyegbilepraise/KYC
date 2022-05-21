@@ -53,33 +53,37 @@ const customer_kyc = async (req, res) => {
         let user = newFetch.data.data.userData.data;
 
         if(starting.level == 1 && starting.confirmed == 0) {
-          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level} `
+          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`
           res.status(200).json(message)
         }
-
-        message = await interactive.productsButtons(
-          ` Hi, ${user?.profile?.legal_name} \n Kindly Choose from the option below`,
-          [
-            { id: "2", title: "Level 2" },
-            { id: "1", title: "Level 1" },
-          ],
-          req?.body?.provider
-        );
-
-        step++;
-        await KYC.update(
-          {
-            step,
-            full_name: user?.profile?.legal_name,
-            residential_address: user?.home_address?.home_address,
-            email: user.profile?.email,
-            dob: user?.profile.date_of_birth,
-            bvn: user?.profile?.bvn,
-            gender: user?.profile?.gender == 0 ? "Male" : "Female"
-          },
-          { where: { id: starting.id } }
-        );
-        res.status(200).json({ message });
+        else if(starting.level == 2 && starting.confirmed == 0) {
+          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`
+          res.status(200).json(message)
+        } else{
+          message = await interactive.productsButtons(
+            ` Hi, ${user?.profile?.legal_name} \n Kindly Choose from the option below`,
+            [
+              { id: "2", title: "Level 2" },
+              { id: "1", title: "Level 1" },
+            ],
+            req?.body?.provider
+          );
+  
+          step++;
+          await KYC.update(
+            {
+              step,
+              full_name: user?.profile?.legal_name,
+              residential_address: user?.home_address?.home_address,
+              email: user.profile?.email,
+              dob: user?.profile.date_of_birth,
+              bvn: user?.profile?.bvn,
+              gender: user?.profile?.gender == 0 ? "Male" : "Female"
+            },
+            { where: { id: starting.id } }
+          );
+          res.status(200).json({ message });
+        }
       } else {
         res.status(200).json({ message: fetch.data.message });
       }
@@ -242,6 +246,13 @@ const customer_kyc = async (req, res) => {
       );
       res.status(200).json(message);
     } else if (step == 5 && stage == 2) {
+      await KYC.update(
+        {
+          signature: response,
+          step: 0, stage: 0, level: 2
+        },
+        { where: { id: starting.id } }
+      );
       res
         .status(200)
         .json("Thank you. We will review your request and get back to you.");
