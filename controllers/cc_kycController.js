@@ -60,8 +60,8 @@ const customer_kyc = async (req, res) => {
           let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`
           res.status(200).json(message)
         } else{
-          message = await interactive.productsButtons(
-            ` Hi, ${user?.profile?.legal_name} \n You're currently on KYC Level ${starting.level}\n \n Kindly Choose from the option below`,
+          message = await interactive.List(
+            `Hi, ${user?.profile?.legal_name} \n You're currently on KYC Level ${starting.level}\n \n Kindly Select from the option below`,
             [
               { id: "2", title: "Level 2" },
               { id: "1", title: "Level 1" },
@@ -148,7 +148,11 @@ const customer_kyc = async (req, res) => {
       }
     } else if (step == 3 && stage == 1) {
       step++;
-      let message = "Kindly enter your gender.";
+      let messages = "Kindly select your gender.";
+      let message = await interactive.List(messages, [
+        {id: "1", title: "Male"},
+        {id: "2", title: "Female"}
+      ])
       await KYC.update(
         {
           step,
@@ -164,13 +168,23 @@ const customer_kyc = async (req, res) => {
         [{ id: "1", title: "Skip" }],
         req?.body?.provider
       );
-      await KYC.update(
-        {
-          step,
-          gender: response,
-        },
-        { where: { id: starting.id } }
-      );
+      if(response == 1){
+        await KYC.update(
+          {
+            step,
+            gender: "Male",
+          },
+          { where: { id: starting.id } }
+        );
+      } else if (response == 2){
+        await KYC.update(
+          {
+            step,
+            gender: "Female",
+          },
+          { where: { id: starting.id } }
+        );
+      }
       res.status(200).json(message);
     } else if (step == 5 && stage == 1) {
       if (response == 1) {
