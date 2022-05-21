@@ -12,6 +12,8 @@ module.exports = (sequelize, DataTypes) => {
         bvn: {type: DataTypes.STRING, required: false},
         nin: {type: DataTypes.STRING, required: false},
         signature: {type: DataTypes.STRING, required: false},
+        level: {type: DataTypes.INTEGER, required: false, defaultValue: 0},
+        confirmed: {type: DataTypes.INTEGER, required: false, defaultValue: 0}
     })
 
     return KYC;

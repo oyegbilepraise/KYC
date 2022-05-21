@@ -50,8 +50,15 @@ const customer_kyc = async (req, res) => {
           }
         );
 
+        let user = newFetch.data.data.userData.data;
+
+        if(starting.level == 1 && starting.confirmed == 0) {
+          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level} `
+          res.status(200).json(message)
+        }
+
         message = await interactive.productsButtons(
-          "Kindly Choose from the option below",
+          ` Hi, ${user?.profile?.legal_name} \n Kindly Choose from the option below`,
           [
             { id: "2", title: "Level 2" },
             { id: "1", title: "Level 1" },
@@ -59,7 +66,6 @@ const customer_kyc = async (req, res) => {
           req?.body?.provider
         );
 
-        let user = newFetch.data.data.userData.data;
         step++;
         await KYC.update(
           {
@@ -82,10 +88,10 @@ const customer_kyc = async (req, res) => {
         stage = 1;
         let messages =
           "For level 1 verification, we will need the following: \n";
-        messages += "Profile picture \n";
-        messages += "DOB \n";
-        messages += "Gender \n";
-        messages += "Email (if available) \n";
+        messages += "*[1]*. Profile picture \n";
+        messages += "*[2]*. DOB \n";
+        messages += "*[3]*. Gender \n";
+        messages += "*[4]*.Email (if available) \n";
 
         let message = await interactive.productsButtons(
           messages,
@@ -190,6 +196,7 @@ const customer_kyc = async (req, res) => {
         {
           step: 0, stage: 0,
           profile_picture: response,
+          level: 1, 
         },
         { where: { id: starting.id } }
       );
