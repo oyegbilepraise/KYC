@@ -274,9 +274,12 @@ const getAll = async (req, res) => {
 const deleteOne = async (req, res) => {
   const {id} = req.body
   try{
-    let data = await KYC.destroy({
-      where: {id}
-    }) 
+    let data = await KYC.update(
+      {
+        delete: 1
+      },
+      { where: { id } }
+    );
 
     res.status(200).json(data)
   } catch(error){

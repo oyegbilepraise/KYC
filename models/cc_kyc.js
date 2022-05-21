@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
         nin: {type: DataTypes.STRING, required: false},
         signature: {type: DataTypes.STRING, required: false},
         level: {type: DataTypes.INTEGER, required: false, defaultValue: 0},
-        confirmed: {type: DataTypes.INTEGER, required: false, defaultValue: 0}
+        confirmed: {type: DataTypes.INTEGER, required: false, defaultValue: 0},
+        delete: {type: DataTypes.INTEGER, required: false, defaultValue: 0}
     })
 
     return KYC;
