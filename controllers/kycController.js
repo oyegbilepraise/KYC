@@ -505,7 +505,6 @@ const kyc = async (req, res) => {
       if (response == 1) {
         let messages =
           "Click attach then choose location and click *Send your current location*";
-
         message = await interactive.Location(messages, req.body.provider);
       } else {
         step++;

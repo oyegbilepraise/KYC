@@ -483,6 +483,61 @@ class Responses {
     return message;
   }
 
+  static async messangeImage(info, phone, provider, channelId) {
+    let url;
+    let { payload } = info;
+    let head;
+    let body;
+
+    if (provider == "web") {
+      url = "https://bnpl-chatbot-server.herokuapp.com/direct";
+
+      head = {
+        Authorization: `Bearer ${process.env.MESSENGER_TOKEN}`,
+      };
+      body = {
+        phone: phone.replace(" ", ""),
+        message: payload,
+      };
+    } else if (provider == "messengerpeople") {
+      url = "https://api.messengerpeople.dev/messages";
+
+      head = {
+        Authorization: `Bearer ${process.env.MESSENGER_TOKEN}`,
+      };
+      body = {
+        recipient: phone.replace(" ", ""),
+        sender: channelId,
+        payload,
+      };
+    } else if (provider == "messagebird") {
+      url = "https://conversations.messagebird.com/v1/send";
+
+      head = {
+        Authorization: `${process.env.MESSENGEBIRD_TOKEN}`,
+      };
+      body = {
+        to: phone.replace(" ", ""),
+        from: channelId,
+        type: "image",
+        content: payload,
+      };
+    }
+
+    return new Promise((resolve) => {
+      axios
+        .post(url, body, { headers: head })
+        .then(async (response) => {
+          console.log(response.data);
+          resolve(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+          return "error";
+        });
+    });
+  }
+
   static async Location(text, provider) {
     let message;
 
