@@ -502,12 +502,19 @@ const kyc = async (req, res) => {
         message = "Thank you. your exercise has been completed";
       }
     } else if (step == 4 && stage == 1 && sub_step == 0) {
-      step++;
-      await KYC.update(
-        { location: response, step },
-        { where: { id: starting.id } }
-      );
-      message = "Take Picture of estate entrance";
+      if (response == 1) {
+        let messages =
+          "Click attach then choose location and click *Send your current location*";
+
+        message = await interactive.Location(messages, req.body.provider);
+      } else {
+        step++;
+        await KYC.update(
+          { location: response, step },
+          { where: { id: starting.id } }
+        );
+        message = "Take Picture of estate entrance";
+      }
     } else if (step == 5 && stage == 1 && sub_step == 0) {
       await KYC.update({ picture: response }, { where: { id: starting.id } });
       message = "Thank you. your exercise has been completed";
