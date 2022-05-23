@@ -505,7 +505,20 @@ const kyc = async (req, res) => {
       if (response == 1) {
         let messages =
           "Click attach then choose location and click *Send your current location*";
-        message = await interactive.Location(messages, req.body.provider);
+
+        let payload = await interactive.Location(messages, req.body.provider);
+
+        await interactive.messangeImage(
+          payload,
+          req.body.phoneNumber,
+          req.body.provider,
+          req.body.channelId
+        );
+        
+        message = "to choose restaurant. See image above for guide: 👆";
+        // setTimeout(() => {
+        //   res.send({ message: message });
+        // }, 1000);
       } else {
         step++;
         await KYC.update(
