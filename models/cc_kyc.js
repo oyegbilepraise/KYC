@@ -14,7 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         signature: {type: DataTypes.STRING, required: false},
         level: {type: DataTypes.INTEGER, required: false, defaultValue: 0},
         confirmed: {type: DataTypes.INTEGER, required: false, defaultValue: 0},
-        delete: {type: DataTypes.INTEGER, required: false, defaultValue: 0}
+        delete: {type: DataTypes.INTEGER, required: false, defaultValue: 0},
+        nok_name: {type: DataTypes.STRING, required: false},
+        nok_email: {type: DataTypes.STRING, required: false},
+        nok_phone: {type: DataTypes.STRING, required: false},
+        nok_address: {type: DataTypes.STRING, required: false},
+        nok_relationship: {type: DataTypes.STRING, required: false}
     })
 
     return KYC;
