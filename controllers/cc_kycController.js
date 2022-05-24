@@ -56,6 +56,12 @@ const customer_kyc = async (req, res) => {
         if (starting.level == 2 && starting.confirmed == 0) {
           let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`;
           res.status(200).json(message);
+        } else if (starting.level == 1 && starting.confirmed == 0) {
+          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`;
+          res.status(200).json(message);
+        } else if (starting.level == 2 && starting.confirmed == 1) {
+          let message = `Hi, ${user?.profile?.legal_name} \n You are currently on our highest KYC Level \n Thanks`;
+          res.status(200).json(message);
         } else {
           if (
             user?.profile?.legal_name != "" &&
@@ -170,7 +176,8 @@ const customer_kyc = async (req, res) => {
           [{ id: "1", title: "Get Started" }],
           req?.body?.provider
         );
-        step = 3; stage = 1;
+        step = 3;
+        stage = 1;
         await KYC.update(
           {
             step: 3,
@@ -193,7 +200,8 @@ const customer_kyc = async (req, res) => {
           req?.body?.provider
         );
         res.status(200).json(message);
-        step = 2; stage = 2;
+        step = 2;
+        stage = 2;
         await KYC.update(
           {
             step: 2,
@@ -438,7 +446,7 @@ const customer_kyc = async (req, res) => {
     //       { where: { id: starting.id } }
     //     );
     //   }
-    // } 
+    // }
     else if (step == 3 && stage == 1) {
       if (response == 1) {
         let message = "Kindly enter your date of birth.";
@@ -455,9 +463,9 @@ const customer_kyc = async (req, res) => {
       step++;
       let messages = "Kindly select your gender.";
       let message = await interactive.List(messages, [
-        {id: "1", title: "Male"},
-        {id: "2", title: "Female"}
-      ])
+        { id: "1", title: "Male" },
+        { id: "2", title: "Female" },
+      ]);
       await KYC.update(
         {
           step,
@@ -473,7 +481,7 @@ const customer_kyc = async (req, res) => {
         [{ id: "1", title: "Skip" }],
         req?.body?.provider
       );
-      if(response == 1){
+      if (response == 1) {
         await KYC.update(
           {
             step,
@@ -481,7 +489,7 @@ const customer_kyc = async (req, res) => {
           },
           { where: { id: starting.id } }
         );
-      } else if (response == 2){
+      } else if (response == 2) {
         await KYC.update(
           {
             step,
@@ -517,7 +525,8 @@ const customer_kyc = async (req, res) => {
     } else if (step == 7 && stage == 1) {
       await KYC.update(
         {
-          step: 0, stage: 0,
+          step: 0,
+          stage: 0,
           profile_picture: response,
           level: 1,
         },
@@ -526,7 +535,7 @@ const customer_kyc = async (req, res) => {
       res
         .status(200)
         .json("Thank you. We will review your request and get back to you.");
-    } 
+    }
     // else if (step == 2 && stage == 2) {
     //   if (response == 1) {
     //     let message = "Kindly provide your BVN.";
