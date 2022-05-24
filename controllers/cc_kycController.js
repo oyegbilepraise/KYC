@@ -52,66 +52,70 @@ const customer_kyc = async (req, res) => {
         );
 
         let user = newFetch.data.data.userData.data;
-        if (
-          user?.profile?.legal_name != "" &&
-          user?.profile?.email != "" &&
-          user?.profile?.date_of_birth != "" &&
-          user?.profile?.gender != "" &&
-          user?.home_address?.home_address != ""
-        ) {
-          step++;
-          await KYC.update(
-            {
-              step,
-              full_name: user?.profile?.legal_name,
-              residential_address: user?.home_address?.home_address,
-              email: user.profile?.email,
-              dob: user?.profile.date_of_birth,
-              bvn: user?.profile?.bvn,
-              level: 1,
-              stage: 2,
-              gender: user?.profile?.gender == 0 ? "Male" : "Female",
-            },
-            { where: { id: starting.id } }
-          );
 
-          let messages = `Hi ${user?.profile?.legal_name} \n You're currently on KYC Level 1`;
-          let message = await interactive.productsButtons(
-            messages,
-            [{ id: "1", title: "Upgrade to Level 2" }],
-            req?.body?.provider
-          );
-          res.status(200).json({ message });
+        if (starting.level == 2 && starting.confirmed == 0) {
+          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`;
+          res.status(200).json(message);
         } else {
-          step++;
-          await KYC.update(
-            {
-              step,
-              stage: 1,
-              full_name: user?.profile?.legal_name,
-              residential_address: user?.home_address?.home_address,
-              email: user.profile?.email,
-              dob: user?.profile.date_of_birth,
-              bvn: user?.profile?.bvn,
-              level: 1,
-              gender: user?.profile?.gender == 0 ? "Male" : "Female",
-            },
-            { where: { id: starting.id } }
-          );
-          let messages = `Hi ${user?.profile?.legal_name} \n You're currently on KYC Level 0`;
-          let message = await interactive.productsButtons(
-            messages,
-            [{ id: "1", title: "Upgrade" }],
-            req?.body?.provider
-          );
-          res.status(200).json({ message });
+          if (
+            user?.profile?.legal_name != "" &&
+            user?.profile?.email != "" &&
+            user?.profile?.date_of_birth != "" &&
+            user?.profile?.gender != "" &&
+            user?.home_address?.home_address != ""
+          ) {
+            step++;
+            await KYC.update(
+              {
+                step,
+                full_name: user?.profile?.legal_name,
+                residential_address: user?.home_address?.home_address,
+                email: user.profile?.email,
+                dob: user?.profile.date_of_birth,
+                bvn: user?.profile?.bvn,
+                level: 1,
+                stage: 2,
+                gender: user?.profile?.gender == 0 ? "Male" : "Female",
+              },
+              { where: { id: starting.id } }
+            );
+
+            let messages = `Hi ${user?.profile?.legal_name} \n You're currently on KYC Level 1`;
+            let message = await interactive.productsButtons(
+              messages,
+              [{ id: "1", title: "Upgrade to Level 2" }],
+              req?.body?.provider
+            );
+            res.status(200).json({ message });
+          } else {
+            step++;
+            await KYC.update(
+              {
+                step,
+                stage: 1,
+                full_name: user?.profile?.legal_name,
+                residential_address: user?.home_address?.home_address,
+                email: user.profile?.email,
+                dob: user?.profile.date_of_birth,
+                bvn: user?.profile?.bvn,
+                level: 0,
+                gender: user?.profile?.gender == 0 ? "Male" : "Female",
+              },
+              { where: { id: starting.id } }
+            );
+            let messages = `Hi ${user?.profile?.legal_name} \n You're currently on KYC Level 0`;
+            let message = await interactive.productsButtons(
+              messages,
+              [{ id: "1", title: "Upgrade" }],
+              req?.body?.provider
+            );
+            res.status(200).json({ message });
+          }
         }
       } else {
         res.status(200).json({ message: fetch.data.message });
       }
     } else if (stage == 2 && step == 1) {
-      console.log("enter");
-      console.log(response);
       if (response == 1) {
         let messages =
           "For level 2 verification, we will need the following: \n";
@@ -151,6 +155,53 @@ const customer_kyc = async (req, res) => {
         },
         { where: { id: starting.id } }
       );
+      res.status(200).json(message);
+    } else if (step == 2 && stage == 1) {
+      if (response == 1) {
+        let messages =
+          "For level 1 verification, we will need the following: \n";
+        messages += "*[1]*. Profile picture \n";
+        messages += "*[2]*. DOB \n";
+        messages += "*[3]*. Gender \n";
+        messages += "*[4]*.Email (if available) \n";
+
+        let message = await interactive.productsButtons(
+          messages,
+          [{ id: "1", title: "Get Started" }],
+          req?.body?.provider
+        );
+        step = 3; stage = 1;
+        await KYC.update(
+          {
+            step: 3,
+            stage: 1,
+          },
+          { where: { id: starting.id } }
+        );
+        res.status(200).json(message);
+      } else if (response == 2) {
+        let messages =
+          "For level 2 verification, we will need the following: \n";
+        messages += "BVN \n";
+        messages += "NIN \n";
+        messages += "Next of Kin Details \n";
+        messages += "Signature";
+
+        let message = await interactive.productsButtons(
+          messages,
+          [{ id: "1", title: "Get Started" }],
+          req?.body?.provider
+        );
+        res.status(200).json(message);
+        step = 2; stage = 2;
+        await KYC.update(
+          {
+            step: 2,
+            stage: 2,
+          },
+          { where: { id: starting.id } }
+        );
+      }
     } else if (stage == 2 && step == 2) {
       step++;
       let message = "Kindly provide your NIN.";
@@ -207,6 +258,17 @@ const customer_kyc = async (req, res) => {
       res.status(200).json(message);
     } else if (stage == 2 && step == 7) {
       step++;
+      let message = "Kindly provide your BVN.";
+      await KYC.update(
+        {
+          nok_phone: response,
+          step,
+        },
+        { where: { id: starting.id } }
+      );
+      res.status(200).json(message);
+    } else if (stage == 2 && step == 8) {
+      step++;
       let messages = "Kindly Select your relationship with the next of kin.";
       let message = await interactive.List(messages, [
         { id: "1", title: "Parent" },
@@ -218,19 +280,21 @@ const customer_kyc = async (req, res) => {
       ]);
       await KYC.update(
         {
-          nok_phone: response,
+          bvn: response,
           step,
         },
         { where: { id: starting.id } }
       );
       res.status(200).json(message);
-    } else if (stage == 2 && step == 8) {
+    } else if (stage == 2 && step == 9) {
       if (response == 1) {
         step++;
         await KYC.update(
           {
-            nok_relationship: 'Parent',
-            step,
+            nok_relationship: "Parent",
+            level: 2,
+            step: 0,
+            stage: 0,
           },
           { where: { id: starting.id } }
         );
@@ -239,7 +303,9 @@ const customer_kyc = async (req, res) => {
         await KYC.update(
           {
             nok_relationship: "Spouse",
-            step,
+            level: 2,
+            step: 0,
+            stage: 0,
           },
           { where: { id: starting.id } }
         );
@@ -248,7 +314,9 @@ const customer_kyc = async (req, res) => {
         await KYC.update(
           {
             nok_relationship: "Relatives",
-            step,
+            level: 2,
+            step: 0,
+            stage: 0,
           },
           { where: { id: starting.id } }
         );
@@ -257,7 +325,9 @@ const customer_kyc = async (req, res) => {
         await KYC.update(
           {
             nok_relationship: "Colleagues",
-            step,
+            level: 2,
+            step: 0,
+            stage: 0,
           },
           { where: { id: starting.id } }
         );
@@ -266,7 +336,9 @@ const customer_kyc = async (req, res) => {
         await KYC.update(
           {
             nok_relationship: "Siblings",
-            step,
+            level: 2,
+            step: 0,
+            stage: 0,
           },
           { where: { id: starting.id } }
         );
@@ -275,13 +347,16 @@ const customer_kyc = async (req, res) => {
         await KYC.update(
           {
             nok_relationship: "Friend",
-            step,
+            level: 2,
+            step: 0,
+            stage: 0,
           },
           { where: { id: starting.id } }
         );
       }
-      let message = 'Thank you. We will review your request and get back to you.'
-      res.status(200).json(message)
+      let message =
+        "Thank you. We will review your request and get back to you.";
+      res.status(200).json(message);
     }
 
     // if(starting.level == 1 && starting.confirmed == 0) {
@@ -363,94 +438,96 @@ const customer_kyc = async (req, res) => {
     //       { where: { id: starting.id } }
     //     );
     //   }
-    // } else if (step == 2 && stage == 1) {
-    //   if (response == 1) {
-    //     let message = "Kindly enter your date of birth.";
-    //     res.status(200).json(message);
-    //     step++;
-    //     await KYC.update(
-    //       {
-    //         step,
-    //       },
-    //       { where: { id: starting.id } }
-    //     );
-    //   }
-    // } else if (step == 3 && stage == 1) {
-    //   step++;
-    //   let messages = "Kindly select your gender.";
-    //   let message = await interactive.List(messages, [
-    //     {id: "1", title: "Male"},
-    //     {id: "2", title: "Female"}
-    //   ])
-    //   await KYC.update(
-    //     {
-    //       step,
-    //       dob: response,
-    //     },
-    //     { where: { id: starting.id } }
-    //   );
-    //   res.status(200).json(message);
-    // } else if (step == 4 && stage == 1) {
-    //   step++;
-    //   let message = await interactive.productsButtons(
-    //     "Kindly enter your email",
-    //     [{ id: "1", title: "Skip" }],
-    //     req?.body?.provider
-    //   );
-    //   if(response == 1){
-    //     await KYC.update(
-    //       {
-    //         step,
-    //         gender: "Male",
-    //       },
-    //       { where: { id: starting.id } }
-    //     );
-    //   } else if (response == 2){
-    //     await KYC.update(
-    //       {
-    //         step,
-    //         gender: "Female",
-    //       },
-    //       { where: { id: starting.id } }
-    //     );
-    //   }
-    //   res.status(200).json(message);
-    // } else if (step == 5 && stage == 1) {
-    //   if (response == 1) {
-    //     let message = "Kindly Upload your profile picture.";
-    //     res.status(200).json(message);
-    //     step++;
-    //     await KYC.update(
-    //       {
-    //         step,
-    //       },
-    //       { where: { id: starting.id } }
-    //     );
-    //   } else {
-    //     step++;
-    //     let message = "Kindly Upload your profile picture.";
-    //     await KYC.update(
-    //       {
-    //         step,
-    //         email: response,
-    //       },
-    //       { where: { id: starting.id } }
-    //     );
-    //     res.status(200).json(message);
-    //   }
-    // } else if (step == 6 && stage == 1) {
-    //   await KYC.update(
-    //     {
-    //       step: 0, stage: 0,
-    //       profile_picture: response,
-    //       level: 1,
-    //     },
-    //     { where: { id: starting.id } }
-    //   );
-    //   res
-    //     .status(200)
-    //     .json("Thank you. We will review your request and get back to you.");
-    // } else if (step == 2 && stage == 2) {
+    // } 
+    else if (step == 3 && stage == 1) {
+      if (response == 1) {
+        let message = "Kindly enter your date of birth.";
+        res.status(200).json(message);
+        step++;
+        await KYC.update(
+          {
+            step,
+          },
+          { where: { id: starting.id } }
+        );
+      }
+    } else if (step == 4 && stage == 1) {
+      step++;
+      let messages = "Kindly select your gender.";
+      let message = await interactive.List(messages, [
+        {id: "1", title: "Male"},
+        {id: "2", title: "Female"}
+      ])
+      await KYC.update(
+        {
+          step,
+          dob: response,
+        },
+        { where: { id: starting.id } }
+      );
+      res.status(200).json(message);
+    } else if (step == 5 && stage == 1) {
+      step++;
+      let message = await interactive.productsButtons(
+        "Kindly enter your email",
+        [{ id: "1", title: "Skip" }],
+        req?.body?.provider
+      );
+      if(response == 1){
+        await KYC.update(
+          {
+            step,
+            gender: "Male",
+          },
+          { where: { id: starting.id } }
+        );
+      } else if (response == 2){
+        await KYC.update(
+          {
+            step,
+            gender: "Female",
+          },
+          { where: { id: starting.id } }
+        );
+      }
+      res.status(200).json(message);
+    } else if (step == 6 && stage == 1) {
+      if (response == 1) {
+        let message = "Kindly Upload your profile picture.";
+        res.status(200).json(message);
+        step++;
+        await KYC.update(
+          {
+            step,
+          },
+          { where: { id: starting.id } }
+        );
+      } else {
+        step++;
+        let message = "Kindly Upload your profile picture.";
+        await KYC.update(
+          {
+            step,
+            email: response,
+          },
+          { where: { id: starting.id } }
+        );
+        res.status(200).json(message);
+      }
+    } else if (step == 7 && stage == 1) {
+      await KYC.update(
+        {
+          step: 0, stage: 0,
+          profile_picture: response,
+          level: 1,
+        },
+        { where: { id: starting.id } }
+      );
+      res
+        .status(200)
+        .json("Thank you. We will review your request and get back to you.");
+    } 
+    // else if (step == 2 && stage == 2) {
     //   if (response == 1) {
     //     let message = "Kindly provide your BVN.";
     //     res.status(200).json(message);
