@@ -54,13 +54,13 @@ const customer_kyc = async (req, res) => {
         let user = newFetch.data.data.userData.data;
 
         if (starting.level == 2 && starting.confirmed == 0) {
-          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`;
+          let message = `Hi, ${user?.profile?.legal_name} \nYou have a pending confirmation on KYC-Level ${starting.level}`;
           res.status(200).json(message);
         } else if (starting.level == 1 && starting.confirmed == 0) {
-          let message = `Hi, ${user?.profile?.legal_name} \n You have a pending confirmation on KYC-Level ${starting.level}`;
+          let message = `Hi, ${user?.profile?.legal_name} \nYou have a pending confirmation on KYC-Level ${starting.level}`;
           res.status(200).json(message);
         } else if (starting.level == 2 && starting.confirmed == 1) {
-          let message = `Hi, ${user?.profile?.legal_name} \n You are currently on our highest KYC Level \n Thanks`;
+          let message = `Hi, ${user?.profile?.legal_name} \nYou are currently on our highest KYC Level \nThanks`;
           res.status(200).json(message);
         } else {
           if (
