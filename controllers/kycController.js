@@ -62,6 +62,7 @@ const kyc = async (req, res) => {
       await KYC.update(
         {
           step,
+          address: data.address,
         },
         { where: { id: starting.id } }
       );
@@ -228,10 +229,10 @@ const kyc = async (req, res) => {
         );
       } else if (response == 2) {
         message = "*[1]*. Enter new address \n";
-        message += "*[2]*.  Location \n";
-        message += "*[3]*.  Property Picture \n";
-        message += "*[4]*. Landmark \n";
-        message += "*[5]*. Landmark Picture \n";
+        message += "*[2]*. Edit Location \n";
+        message += "*[3]*. Edit Property Picture \n";
+        message += "*[4]*. Edit Landmark \n";
+        message += "*[5]*. Edit Landmark Picture \n";
         step++;
         await KYC.update(
           {
@@ -514,8 +515,8 @@ const kyc = async (req, res) => {
           req.body.provider,
           req.body.channelId
         );
-        
-        message = "to choose restaurant. See image above for guide: 👆";
+
+        message = "to choose Location. See image below for guide: 👆";
         // setTimeout(() => {
         //   res.send({ message: message });
         // }, 1000);
@@ -528,8 +529,71 @@ const kyc = async (req, res) => {
         message = "Take Picture of estate entrance";
       }
     } else if (step == 5 && stage == 1 && sub_step == 0) {
-      await KYC.update({ picture: response }, { where: { id: starting.id } });
-      message = "Thank you. your exercise has been completed";
+      step++;
+      await KYC.update(
+        { picture: response, step },
+        { where: { id: starting.id } }
+      );
+      message = "Provide a landmark closest to address";
+    } else if (step == 6 && stage == 1 && sub_step == 0) {
+      step++;
+      await KYC.update(
+        { landmark: response, step },
+        { where: { id: starting.id } }
+      );
+      message = "Kindly take picture of the landmark";
+    } else if (step == 7 && stage == 1 && sub_step == 0) {
+      step++;
+      await KYC.update(
+        { landmark_picture: response, step },
+        { where: { id: starting.id } }
+      );
+
+      let summary = await KYC.findOne({ where: { id: starting.id } });
+
+      let messages = `Address: ${summary.address} \n`;
+      messages += `Landmark: ${summary.landmark} \n`;
+
+      message = await interactive.RestaurantsDetails(
+        "This is the sumary",
+        messages,
+        summary.picture,
+        [
+          { id: "2", title: "Edit" },
+          { id: "1", title: "save" },
+        ],
+        req.body.provider
+      );
+    } else if (step == 8 && stage == 1 && sub_step == 0){
+      if(response == 1){
+        message = "Thank you. your exercise has been completed";
+      } else if (response == 2){
+        step++;
+        message = "*[1]*. Enter new address \n";
+        message += "*[2]*. Edit Location \n";
+        message += "*[3]*. Edit Property Picture \n";
+        message += "*[4]*. Edit Landmark \n";
+        message += "*[5]*. Edit Landmark Picture \n";
+        step++;
+        await KYC.update(
+          {
+            step,
+          },
+          { where: { id: starting.id } }
+        );
+      } else if (step == 9 && stage == 1 && sub_step == 0){
+        if (response == 1) {
+          message = "Enter new Address";
+        } else if (response == 2) {
+          message = "Share new Location";
+        } else if (response == 3) {
+          message = "Take New Property Picture";
+        } else if (response == 4) {
+          message = "Enter New Landmark";
+        } else if (response == 5) {
+          message = "Enter New Landmark Picture";
+        }
+      }
     }
     return res.status(200).json({ message });
     // }
