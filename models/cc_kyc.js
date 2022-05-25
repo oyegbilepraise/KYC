@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
         nok_email: {type: DataTypes.STRING, required: false},
         nok_phone: {type: DataTypes.STRING, required: false},
         nok_address: {type: DataTypes.STRING, required: false},
-        nok_relationship: {type: DataTypes.STRING, required: false}
+        nok_relationship: {type: DataTypes.STRING, required: false},
+        completed: {type: DataTypes.INTEGER, required: false, defaultValue: 0}
     })
 
     return KYC;
