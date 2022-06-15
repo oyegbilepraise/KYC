@@ -25,7 +25,6 @@ const kyc = async (req, res) => {
 
   let message;
   try {
-    // if (phoneNumber == phone) {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "kyc") {
       stage = 0;
       step = 0;
@@ -517,9 +516,6 @@ const kyc = async (req, res) => {
         );
 
         message = "to choose Location. See image below for guide: 👆";
-        // setTimeout(() => {
-        //   res.send({ message: message });
-        // }, 1000);
       } else {
         step++;
         await KYC.update(
@@ -596,12 +592,6 @@ const kyc = async (req, res) => {
       }
     }
     return res.status(200).json({ message });
-    // }
-    //  else {
-    //   return res
-    //     .status(200)
-    //     .json('Oops!, You"re not allowed to use this service');
-    // }
   } catch (error) {
     res.status(500).json({ error });
   }

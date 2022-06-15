@@ -7,5 +7,6 @@ router.post('/kyc', kycController.kyc)
 router.post('/customer_kyc', ccKycController.customer_kyc)
 router.get('/get_all', ccKycController.getAll)
 router.post('/delete', ccKycController.deleteOne)
+router.post('/agent', ccKycController.Agent)
 
 module.exports = router;
