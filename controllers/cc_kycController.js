@@ -4,6 +4,7 @@ const interactive = require("../helpers/responses");
 const axios = require("axios");
 
 const KYC = db.cc_kyc;
+const AGENT = db.agent
 
 let step = 0;
 let stage = 0;
@@ -494,6 +495,18 @@ const deleteOne = async (req, res) => {
 
 const Agent = async (req, res) => {
   const { phoneNumber, response } = req.body;
+  let newPhone = "0" + phoneNumber.substr(-10);
+
+  let [starting, created] = await AGENT.findOrCreate({
+    where: { phoneNumber: "0" + phoneNumber.substr(-10) },
+    defaults: { phoneNumber: "0" + phoneNumber.substr(-10) },
+  });
+  
+  const { data } = await axios.post(
+    "https://sellbackend.creditclan.com/parent/index.php/rent/getAgents",
+    { phone: newPhone }
+  );
+
 
   try {
     if (
@@ -501,16 +514,9 @@ const Agent = async (req, res) => {
       stage === 0 &&
       response.trim().toLowerCase() === "ercan"
     ) {
-      // const { data } = await axios.post(
-      //   "https://sellbackend.creditclan.com/parent/index.php/rent/getAgents",
-      //   { phone: phoneNumber }
-      // );
-
-      // res.json(data.message);
-
-      if(a = a){
+      if(data.status === true){
         let message = await interactive.List(
-          `Welcome *Lorem Ipsum* to Agent Portal \n What will you like to do?. `,
+          `Welcome *${data.message.full_name}* to Agent Portal \n What will you like to do?. `,
           [
             { id: "2", title: "Check Referrer Balance" },
             { id: "1", title: "Customer's Registration" },
@@ -520,28 +526,87 @@ const Agent = async (req, res) => {
 
         res.status(200).json(message)
         step++
+      } else {
+        let message = 'Sorry, You"re not eligible to use this service'
+        res.status(200).json(message)
       }
-    } else if (stage === 0 && step === 1) {
+    } 
+    else if (stage === 0 && step === 1) {
       if(response == 1){
         let message = 'Kindly Provide the customer"s name.'
         res.status(200).json(message)
         step++
       } else if (response == 2){
-        let message = 'You have 10000 left'
+        let message = `You have ${data.message.balance} left`
         res.status(200).json(message)
       }
     } else if (stage === 0 && step === 2) {
       // Save Customer Name
         let message = 'Kindly provide customer"s phone number'
+        await AGENT.update(
+          {
+            name: response,
+          },
+          { where: { id: starting.id } }
+        );
         res.status(200).json(message)
         step++
       } else if (stage === 0 && step === 3) {
         // Save Customer Number
-        let message = 'Completed Thank you'
+        await AGENT.update(
+          {
+            referal_phone: response,
+          },
+          { where: { id: starting.id } }
+        );
+        let message = await interactive.List(
+          `What Services did the customer use?.`,
+          [
+            { id: "2", title: "Renew Rent" },
+            { id: "1", title: "Found House" },
+            { id: "3", title: "Found me a House" },
+          ],
+          req?.body?.provider
+        );
         res.status(200).json(message)
         step++
-    }
-    console.log(stage, step);
+      } else if (stage === 0 && step === 4) {
+        if (response == 1) {
+          await AGENT.update(
+            {
+              keyword: 'Found House',
+            },
+            { where: { id: starting.id } }
+          );
+        } else if (response == 2){
+          await AGENT.update(
+            {
+              keyword: 'Renew Rent',
+            },
+            { where: { id: starting.id } }
+          );
+        } else if (response == 3){
+          await AGENT.update(
+            {
+              keyword: 'Find me a house',
+            },
+            { where: { id: starting.id } }
+          );
+        }
+
+        let me = await AGENT.findOne({ where: { id: starting.id}})
+
+        await axios.post('https://sellbackend.creditclan.com/parent/index.php/rent/sendRequest', {
+          agent_id: data.message.id,
+          keyword: me.keyword,
+          phone: me.referal_phone
+        }).then(res => {
+          console.log(res.data)
+        })
+        res.status(200).json('Completed! Thank You')
+        step = 0
+        stage = 0
+      }
   } catch (error) {
     res.status(500).json({ error });
   }
