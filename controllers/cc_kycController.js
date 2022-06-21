@@ -519,7 +519,7 @@ const Agent = async (req, res) => {
           `Welcome *${data.message.full_name}* to Agent Portal \n What will you like to do?. `,
           [
             { id: "2", title: "Check Referrer Balance" },
-            { id: "1", title: "Customer's Registration" },
+            { id: "1", title: "Refer a customer" },
           ],
           req?.body?.provider
         );
