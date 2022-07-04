@@ -600,7 +600,7 @@ const Agent = async (req, res) => {
           agent_id: data.message.id,
           keyword: me.keyword,
           phone: me.referal_phone
-        }).then(res => {
+        }).then( res => {
           console.log(res.data)
         })
         res.status(200).json('Completed! Thank You')
