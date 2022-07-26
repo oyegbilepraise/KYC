@@ -560,10 +560,10 @@ const kyc = async (req, res) => {
         ],
         req.body.provider
       );
-    } else if (step == 8 && stage == 1 && sub_step == 0){
-      if(response == 1){
+    } else if (step == 8 && stage == 1 && sub_step == 0) {
+      if (response == 1) {
         message = "Thank you. your exercise has been completed";
-      } else if (response == 2){
+      } else if (response == 2) {
         step++;
         message = "*[1]*. Enter new address \n";
         message += "*[2]*. Edit Location \n";
@@ -577,7 +577,7 @@ const kyc = async (req, res) => {
           },
           { where: { id: starting.id } }
         );
-      } else if (step == 9 && stage == 1 && sub_step == 0){
+      } else if (step == 9 && stage == 1 && sub_step == 0) {
         if (response == 1) {
           message = "Enter new Address";
         } else if (response == 2) {
@@ -597,4 +597,24 @@ const kyc = async (req, res) => {
   }
 };
 
-module.exports = { kyc };
+const hygeia = async (req, res) => {
+  try {
+    const res = await axios.post(
+      `https://mobile.creditclan.com/api/v3/hygeiae/requests`,
+      { start: 0 },
+      {
+        headers: {
+          "x-api-key":
+            "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
+        },
+      }
+    );
+    res
+      .status(200)
+      .json({ status: true, error: false, message: "Success", data: res.data });
+  } catch (error) {
+    return res.status(200).json({ message });
+  }
+};
+
+module.exports = { kyc, hygeia };
