@@ -599,7 +599,7 @@ const kyc = async (req, res) => {
 
 const hygeia = async (req, res) => {
   try {
-    const res = await axios.post(
+    const response = await axios.post(
       `https://mobile.creditclan.com/api/v3/hygeiae/requests`,
       { start: 0 },
       {
@@ -609,9 +609,10 @@ const hygeia = async (req, res) => {
         },
       }
     );
+    console.log(response.data)
     res
       .status(200)
-      .json({ status: true, error: false, message: "Success", data: res.data });
+      .json({ status: true, error: false, message: "Success", data: response.data });
   } catch (error) {
     return res.status(200).json({ message: "Failed", error });
   }
