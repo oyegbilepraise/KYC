@@ -613,7 +613,7 @@ const hygeia = async (req, res) => {
       .status(200)
       .json({ status: true, error: false, message: "Success", data: res.data });
   } catch (error) {
-    return res.status(200).json({ message });
+    return res.status(200).json({ message: "Failed", error });
   }
 };
 
