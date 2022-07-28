@@ -598,10 +598,11 @@ const kyc = async (req, res) => {
 };
 
 const hygeia = async (req, res) => {
+  const {start} = req.body
   try {
     const response = await axios.post(
       `https://mobile.creditclan.com/api/v3/hygeiae/requests`,
-      { start: 0 },
+      { start },
       {
         headers: {
           "x-api-key":
