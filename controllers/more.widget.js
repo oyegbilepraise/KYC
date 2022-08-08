@@ -1,11 +1,7 @@
 const TEST_URL = "https://sandbox.vtpass.com/api/pay";
 const username = "technical@creditclan.com";
 const password = "cr3d!tcl@nDonotD3l3t3!@t@!!@gain!s@y@t@ll";
-
-const token = `${username}:${password}`;
-
 const axios = require("axios");
-
 const today = new Date();
 
 const date = `${today.getFullYear()}${
@@ -16,8 +12,6 @@ const date = `${today.getFullYear()}${
   Math.random().toString(30).substring(2, 15) +
   Math.random().toString(30).substring(2, 15)
 }`;
-
-console.log(date);
 
 const airtime = async (req, res) => {
   const { serviceID, amount, phone, name } = req.body;
@@ -76,4 +70,95 @@ const data_variation_codes = async (req, res) => {
   }
 };
 
-module.exports = { airtime, data_variation_codes, data_subscripton };
+const cabletv_variation_codes = async (req, res) => {
+  const { serviceID } = req.body;
+  try {
+    const VT = await axios.get(
+      `https://sandbox.vtpass.com/api/service-variations?serviceID=${serviceID}`
+    );
+    res.status(200).json({ data: VT.data });
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+const verify_smartcard_number = async (req, res) => {
+  const { serviceID, billersCode } = req.body;
+  try {
+    const VT = await axios.post(
+      `https://sandbox.vtpass.com/api/merchant-verify`,
+      { billersCode, serviceID },
+      { auth: { username, password } }
+    );
+    res.status(200).json({ data: VT.data });
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+const renew_catbletv_sub = async (req, res) => {
+  const { serviceID, billersCode, amount, phone } = req.body;
+  try {
+    const VT = await axios.post(
+      `${TEST_URL}`,
+      {
+        request_id: date,
+        serviceID,
+        amount,
+        phone,
+        billersCode,
+        subscription_type: "renew",
+      },
+      { auth: { username, password } }
+    );
+    res.status(200).json({ data: VT.data });
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+const verify_meter_number = async (req, res) => {
+  try {
+    const { serviceID, billersCode, type } = req.body;
+    const VT = await axios.post(
+      `https://sandbox.vtpass.com/api/merchant-verify`,
+      { billersCode, serviceID, type },
+      { auth: { username, password } }
+    );
+    res.status(200).json({ data: VT.data });
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+const renew_meter_subscription = async (req, res) => {
+  const { serviceID, billersCode, amount, phone, variation_code } = req.body;
+  try {
+    const VT = await axios.post(
+      `${TEST_URL}`,
+      {
+        request_id: date,
+        serviceID,
+        amount,
+        phone,
+        billersCode,
+        variation_code
+      },
+      { auth: { username, password } }
+    );
+    res.status(200).json({ data: VT.data });
+  } catch (error) {
+    res.json({ error });
+  }
+};
+
+module.exports = {
+  airtime,
+  data_variation_codes,
+  data_subscripton,
+  cabletv_variation_codes,
+  verify_smartcard_number,
+  renew_catbletv_sub,
+  verify_meter_number,
+  renew_meter_subscription
+};
