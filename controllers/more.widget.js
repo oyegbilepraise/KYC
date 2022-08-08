@@ -4,13 +4,17 @@ const password = "cr3d!tcl@nDonotD3l3t3!@t@!!@gain!s@y@t@ll";
 const axios = require("axios");
 const today = new Date();
 
+let africa = today.toLocaleString("en-US", { timeZone: "Africa/Lagos" });
+
+let a = new Date(africa).getHours();
+
 const date = `${today.getFullYear()}${
   today.getMonth() < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1
 }${today.getDate() < 10 ? "0" + today.getDate() : today.getDate()}${
-  today.getHours() < 12 ? "0" + today.getHours() : today.getHours()
+  a < 10 ? "0" + a : a
 }${today.getMinutes() < 10 ? "0" + today.getMinutes() : today.getMinutes()}${
-  Math.random().toString(30).substring(2, 15) +
-  Math.random().toString(30).substring(2, 15)
+  Math.random().toString(36).substring(2, 15) +
+  Math.random().toString(36).substring(2, 15)
 }`;
 
 const airtime = async (req, res) => {
@@ -30,6 +34,7 @@ const airtime = async (req, res) => {
 
     res.status(200).json({ data: VT.data });
   } catch (error) {
+    console.log(error);
     res.json({ error });
   }
 };
@@ -142,7 +147,7 @@ const renew_meter_subscription = async (req, res) => {
         amount,
         phone,
         billersCode,
-        variation_code
+        variation_code,
       },
       { auth: { username, password } }
     );
@@ -160,5 +165,5 @@ module.exports = {
   verify_smartcard_number,
   renew_catbletv_sub,
   verify_meter_number,
-  renew_meter_subscription
+  renew_meter_subscription,
 };
