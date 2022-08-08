@@ -8,6 +8,8 @@ let africa = today.toLocaleString("en-US", { timeZone: "Africa/Lagos" });
 
 let a = new Date(africa).getHours();
 
+console.log({ timestamp: africa, hours: a });
+
 const date = `${today.getFullYear()}${
   today.getMonth() < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1
 }${today.getDate() < 10 ? "0" + today.getDate() : today.getDate()}${
