@@ -8,23 +8,19 @@ let africa = today.toLocaleString("en-US", { timeZone: "Africa/Lagos" });
 
 let a = new Date(africa).getHours();
 
-console.log({ timestamp: africa, hours: a });
-
 const date = `${today.getFullYear()}${
   today.getMonth() < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1
 }${today.getDate() < 10 ? "0" + today.getDate() : today.getDate()}${
   a < 10 ? "0" + a : a
-}${today.getMinutes() < 10 ? "0" + today.getMinutes() : today.getMinutes()}${
-  Math.random().toString(36).substring(2, 15) +
-  Math.random().toString(36).substring(2, 15)
-}`;
+}${today.getMinutes() < 10 ? "0" + today.getMinutes() : today.getMinutes()}`;
 
 const airtime = async (req, res) => {
   const { serviceID, amount, phone, name } = req.body;
 
   try {
+    console.log({ timestamp: africa, hours: a, date });
     const VT = await axios.post(
-      `${TEST_URL}`,
+      `${TEST_URL}`, 
       {
         request_id: date,
         serviceID,
