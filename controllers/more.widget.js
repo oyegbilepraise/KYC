@@ -18,7 +18,6 @@ const airtime = async (req, res) => {
   const { serviceID, amount, phone, name } = req.body;
 
   try {
-    console.log({ timestamp: africa, hours: a, date });
     const VT = await axios.post(
       `${TEST_URL}`, 
       {
@@ -30,10 +29,9 @@ const airtime = async (req, res) => {
       { auth: { username, password } }
     );
 
-    res.status(200).json({ data: VT.data });
+    res.status(200).json({ data: VT.data, status: true });
   } catch (error) {
-    console.log(error);
-    res.json({ error });
+    res.json({ error, status: false });
   }
 };
 

@@ -7,12 +7,6 @@ module.exports = {
     DB: process.env.DATABASE_NAME,
     dialect: 'mysql',
 
-    // HOST: 'localhost',
-    // USER: 'root',
-    // PASSWORD: '',
-    // DB: 'customer_kyc',
-    // dialect: 'mysql',
-
     pool: {
         max: 5,
         min: 0,
