@@ -40,7 +40,7 @@ const airtime = async (req, res) => {
 };
 
 const data_subscripton = async (req, res) => {
-  const { serviceID, amount, phone, billersCode, variation_code } = req.body;
+  const { serviceID, amount, phone, billersCode, variation_code, name } = req.body;
   try {
     const VT = await axios.post(
       `${ TEST_URL }`,
@@ -54,7 +54,12 @@ const data_subscripton = async (req, res) => {
       },
       { auth: { username, password } }
     );
-    res.status(200).json({ data: VT.data });
+    let content = VT.data.content.transactions
+    const db_data = await UTILITIES.create({
+      name, phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+    })
+
+    res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
     res.status(500).json({ error });
   }
