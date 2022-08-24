@@ -1,7 +1,9 @@
 const TEST_URL = "https://sandbox.vtpass.com/api/pay";
 const username = "technical@creditclan.com";
 const password = "cr3d!tcl@nDonotD3l3t3!@t@!!@gain!s@y@t@ll";
+const db = require("../models");
 const axios = require("axios");
+const UTILITIES = db.utilities;
 
 const generateRequestId = () => {
   const str = (new Date()).toLocaleString("en-US", { timeZone: "Africa/Lagos" });
@@ -15,7 +17,7 @@ const generateRequestId = () => {
 };
 
 const airtime = async (req, res) => {
-  const { serviceID, amount, phone } = req.body;
+  const { serviceID, amount, phone, name } = req.body;
   try {
     const VT = await axios.post(
       `${ TEST_URL }`,
@@ -27,7 +29,11 @@ const airtime = async (req, res) => {
       },
       { auth: { username, password } }
     );
-    res.status(200).json({ data: VT.data, status: true });
+    let content = VT.data.content.transactions
+    const db_data = await UTILITIES.create({
+      name, phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+    })
+    res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
     res.status(500).json({ error, status: false });
   }
