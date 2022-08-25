@@ -17,7 +17,7 @@ const generateRequestId = () => {
 };
 
 const airtime = async (req, res) => {
-  const { serviceID, amount, phone, name } = req.body;
+  const { serviceID, amount, phone, full_name } = req.body;
   try {
     const VT = await axios.post(
       `${ TEST_URL }`,
@@ -61,7 +61,7 @@ const data_subscripton = async (req, res) => {
 
     res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error, status: false });
   }
 };
 
@@ -95,9 +95,9 @@ const verify_smartcard_number = async (req, res) => {
       { billersCode, serviceID },
       { auth: { username, password } }
     );
-    res.status(200).json({ data: VT.data });
+    res.status(200).json({ data: VT.data, status: true });
   } catch (error) {
-    res.status(500).json({ error });
+    res.status(500).json({ error, status: false });
   }
 };
 
@@ -116,7 +116,7 @@ const renew_catbletv_sub = async (req, res) => {
       },
       { auth: { username, password } }
     );
-    
+
     res.status(200).json({ data: VT.data });
   } catch (error) {
     res.status(500).json({ error });
