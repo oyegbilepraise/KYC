@@ -9,5 +9,6 @@ router.get('/get_all', ccKycController.getAll)
 router.post('/delete', ccKycController.deleteOne)
 router.post('/agent', ccKycController.Agent)
 router.post('/fetch', kycController.hygeia)
+router.post('/hegeia_schedule', kycController.hygeia_schedule)
 
 module.exports = router;

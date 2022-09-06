@@ -610,7 +610,6 @@ const hygeia = async (req, res) => {
         },
       }
     );
-    console.log(response.data)
     res
       .status(200)
       .json({ status: true, error: false, message: "Success", data: response.data });
@@ -619,4 +618,21 @@ const hygeia = async (req, res) => {
   }
 };
 
-module.exports = { kyc, hygeia };
+const hygeia_schedule = async (req, res) => {
+  const {creditclan_request_id} = req.body
+  try{
+    const response = await axios.post('https://mobile.creditclan.com/api/v3/loan/recovery', {creditclan_request_id},{
+      headers: {
+        "x-api-key":
+          "WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228",
+      },
+    })
+    res
+      .status(200)
+      .json({ status: true, error: false, message: "Success", data: response.data });
+  } catch(error) {
+    return res.status(200).json({ message: "Failed", error });
+  }
+}
+
+module.exports = { kyc, hygeia, hygeia_schedule };
