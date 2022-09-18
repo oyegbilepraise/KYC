@@ -17,7 +17,7 @@ const generateRequestId = () => {
 };
 
 const airtime = async (req, res) => {
-  const { serviceID, amount, phone, full_name } = req.body;
+  const { serviceID, amount, phone } = req.body;
   try {
     const VT = await axios.post(
       `${ TEST_URL }`,
@@ -31,16 +31,17 @@ const airtime = async (req, res) => {
     );
     let content = VT.data.content.transactions
     const db_data = await UTILITIES.create({
-      name, phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+      phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
     res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
+    console.log({error});
     res.status(500).json({ error, status: false });
   }
 };
 
 const data_subscripton = async (req, res) => {
-  const { serviceID, amount, phone, billersCode, variation_code, name } = req.body;
+  const { serviceID, amount, phone, billersCode, variation_code } = req.body;
   try {
     const VT = await axios.post(
       `${ TEST_URL }`,
@@ -56,11 +57,12 @@ const data_subscripton = async (req, res) => {
     );
     let content = VT.data.content.transactions
     const db_data = await UTILITIES.create({
-      name, phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
 
     res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
+    console.log({error});
     res.status(500).json({ error, status: false });
   }
 };
@@ -83,6 +85,7 @@ const cabletv_variation_codes = async (req, res) => {
     );
     res.status(200).json({ data: VT.data });
   } catch (error) {
+    console.log({error});
     res.status(500).json({ error });
   }
 };
@@ -97,6 +100,7 @@ const verify_smartcard_number = async (req, res) => {
     );
     res.status(200).json({ data: VT.data, status: true });
   } catch (error) {
+    console.log({error});
     res.status(500).json({ error, status: false });
   }
 };
@@ -119,6 +123,7 @@ const renew_catbletv_sub = async (req, res) => {
 
     res.status(200).json({ data: VT.data });
   } catch (error) {
+    console.log({error});
     res.status(500).json({ error });
   }
 };
@@ -133,6 +138,7 @@ const verify_meter_number = async (req, res) => {
     );
     res.status(200).json({ data: VT.data });
   } catch (error) {
+    console.log({error});
     res.status(500).json({ error });
   }
 };
@@ -154,6 +160,7 @@ const renew_meter_subscription = async (req, res) => {
     );
     res.status(200).json({ data: VT.data });
   } catch (error) {
+    console.log({error});
     res.status(500).json({ error });
   }
 };
