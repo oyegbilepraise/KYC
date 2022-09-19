@@ -30,6 +30,7 @@ const airtime = async (req, res) => {
       { auth: { username, password } }
     );
     let content = VT.data.content.transactions
+    log
     const db_data = await UTILITIES.create({
       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
@@ -39,6 +40,32 @@ const airtime = async (req, res) => {
     res.status(500).json({ error, status: false });
   }
 };
+
+const international = async (req, res) => {
+  try{
+    const { serviceID, amount, phone, billersCode, variation_code, operator_id, country_code, product_type_id, email } = req.body;
+    const VT = await axios.post(
+      `${ TEST_URL }`,
+      {
+        request_id: generateRequestId(),
+        serviceID,
+        amount,
+        phone,
+        billersCode,
+        variation_code,
+        operator_id,
+        country_code,
+        product_type_id,
+        email
+      },
+      { auth: { username, password } }
+    );
+    res.status(200).json({ data: VT.data, status: true });
+  } catch(error){
+    console.log({error});
+    res.status(500).json({ error, status: false });
+  }
+}
 
 const data_subscripton = async (req, res) => {
   const { serviceID, amount, phone, billersCode, variation_code } = req.body;
@@ -56,6 +83,7 @@ const data_subscripton = async (req, res) => {
       { auth: { username, password } }
     );
     let content = VT.data.content.transactions
+    console.log(VT.data)
     const db_data = await UTILITIES.create({
        phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
@@ -106,7 +134,7 @@ const verify_smartcard_number = async (req, res) => {
 };
 
 const renew_catbletv_sub = async (req, res) => {
-  const { serviceID, billersCode, amount, phone } = req.body;
+  const { serviceID, billersCode, amount, phone, variation_code } = req.body;
   try {
     const VT = await axios.post(
       `${ TEST_URL }`,
@@ -117,6 +145,7 @@ const renew_catbletv_sub = async (req, res) => {
         phone,
         billersCode,
         subscription_type: "renew",
+        variation_code
       },
       { auth: { username, password } }
     );
@@ -174,4 +203,5 @@ module.exports = {
   renew_catbletv_sub,
   verify_meter_number,
   renew_meter_subscription,
+  international
 };
