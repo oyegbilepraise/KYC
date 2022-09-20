@@ -30,7 +30,6 @@ const airtime = async (req, res) => {
       { auth: { username, password } }
     );
     let content = VT.data.content.transactions
-    log
     const db_data = await UTILITIES.create({
       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
