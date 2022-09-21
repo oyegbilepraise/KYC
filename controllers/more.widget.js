@@ -153,6 +153,12 @@ const renew_catbletv_sub = async (req, res) => {
       { auth: { username, password } }
     );
 
+    let content = VT.data.content.transactions
+    console.log(VT.data)
+    const db_data = await UTILITIES.create({
+       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+    })
+
     res.status(200).json({ data: VT.data });
   } catch (error) {
     console.log({error});
@@ -190,6 +196,11 @@ const renew_meter_subscription = async (req, res) => {
       },
       { auth: { username, password } }
     );
+    let content = VT.data.content.transactions
+    console.log(VT.data)
+    const db_data = await UTILITIES.create({
+       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+    })
     res.status(200).json({ data: VT.data });
   } catch (error) {
     console.log({error});
