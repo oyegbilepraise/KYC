@@ -1,4 +1,5 @@
 const TEST_URL = "https://sandbox.vtpass.com/api/pay";
+const LIVE_URL = "https://vtpass.com/api/pay"
 const username = "technical@creditclan.com";
 const password = "cr3d!tcl@nDonotD3l3t3!@t@!!@gain!s@y@t@ll";
 const db = require("../models");
@@ -20,7 +21,7 @@ const airtime = async (req, res) => {
   const { serviceID, amount, phone } = req.body;
   try {
     const VT = await axios.post(
-      `${ TEST_URL }`,
+      `${ LIVE_URL }`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -44,7 +45,7 @@ const international = async (req, res) => {
   try{
     const { serviceID, amount, phone, billersCode, variation_code, operator_id, country_code, product_type_id, email } = req.body;
     const VT = await axios.post(
-      `${ TEST_URL }`,
+      `${ LIVE_URL }`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -70,7 +71,7 @@ const data_subscripton = async (req, res) => {
   const { serviceID, amount, phone, billersCode, variation_code } = req.body;
   try {
     const VT = await axios.post(
-      `${ TEST_URL }`,
+      `${ LIVE_URL }`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -97,7 +98,7 @@ const data_subscripton = async (req, res) => {
 const data_variation_codes = async (req, res) => {
   const { network } = req.body;
   try {
-    const VT = await axios.get(`https://sandbox.vtpass.com/api/service-variations?serviceID=${ network }`);
+    const VT = await axios.get(`https://vtpass.com/api/service-variations?serviceID=${ network }`);
     res.status(200).json({ data: VT.data });
   } catch (error) {
     res.status(500).json({ error });
@@ -108,7 +109,7 @@ const cabletv_variation_codes = async (req, res) => {
   const { serviceID } = req.body;
   try {
     const VT = await axios.get(
-      `https://sandbox.vtpass.com/api/service-variations?serviceID=${ serviceID }`
+      `https://vtpass.com/api/service-variations?serviceID=${ serviceID }`
     );
     res.status(200).json({ data: VT.data });
   } catch (error) {
@@ -121,7 +122,7 @@ const verify_smartcard_number = async (req, res) => {
   const { serviceID, billersCode } = req.body;
   try {
     const VT = await axios.post(
-      `https://sandbox.vtpass.com/api/merchant-verify`,
+      `https://vtpass.com/api/merchant-verify`,
       { billersCode, serviceID },
       { auth: { username, password } }
     );
@@ -136,7 +137,7 @@ const renew_catbletv_sub = async (req, res) => {
   const { serviceID, billersCode, amount, phone, variation_code } = req.body;
   try {
     const VT = await axios.post(
-      `${ TEST_URL }`,
+      `${ LIVE_URL }`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -160,7 +161,7 @@ const verify_meter_number = async (req, res) => {
   try {
     const { serviceID, billersCode, type } = req.body;
     const VT = await axios.post(
-      `https://sandbox.vtpass.com/api/merchant-verify`,
+      `https://vtpass.com/api/merchant-verify`,
       { billersCode, serviceID, type },
       { auth: { username, password } }
     );
@@ -175,7 +176,7 @@ const renew_meter_subscription = async (req, res) => {
   const { serviceID, billersCode, amount, phone, variation_code } = req.body;
   try {
     const VT = await axios.post(
-      `${ TEST_URL }`,
+      `${ LIVE_URL }`,
       {
         request_id: generateRequestId(),
         serviceID,
