@@ -23,7 +23,7 @@ const airtime = async (req, res) => {
   const { serviceID, amount, phone } = req.body;
   try {
     const VT = await axios.post(
-      `${ TEST_URL }`,
+      `${ LIVE_URL }`,
       {
         request_id: generateRequestId(),
         serviceID,
