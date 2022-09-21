@@ -1,7 +1,7 @@
 const TEST_URL = "https://sandbox.vtpass.com/api/pay";
 const LIVE_URL = "https://vtpass.com/api/pay"
-const username = "technical@creditclan.com";
-const password = "cr3d!tcl@nDonotD3l3t3!@t@!!@gain!s@y@t@ll";
+const username = process.env.VT_USERNAME;
+const password = process.env.VT_PASSWORD;
 const db = require("../models");
 const axios = require("axios");
 const UTILITIES = db.utilities;
@@ -39,7 +39,7 @@ const airtime = async (req, res) => {
     })
     res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
-    console.log({error});
+    // console.log({error});
     res.status(500).json({ error, status: false });
   }
 };
