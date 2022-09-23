@@ -10,5 +10,6 @@ router.post("/verify_smartcard_number", moreController.verify_smartcard_number);
 router.post("/renew_catbletv_sub", moreController.renew_catbletv_sub);
 router.post("/verify_meter_number", moreController.verify_meter_number);
 router.post("/renew_meter_subscription", moreController.renew_meter_subscription);
+router.post("/query_status", moreController.query_status);
 
 module.exports = router;

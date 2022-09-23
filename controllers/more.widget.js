@@ -208,6 +208,20 @@ const renew_meter_subscription = async (req, res) => {
   }
 };
 
+const query_status = async (req, res) => {
+  const {request_id} = req.body;
+  try{
+    const VT = await axios.post(
+      `https://vtpass.com/api/requery`,
+      { request_id },
+      { auth: { username, password } }
+    );
+  } catch(error){
+    console.log({error});
+    res.status(500).json({ error });
+  }
+}
+
 module.exports = {
   airtime,
   data_variation_codes,
@@ -217,5 +231,6 @@ module.exports = {
   renew_catbletv_sub,
   verify_meter_number,
   renew_meter_subscription,
-  international
+  international,
+  query_status
 };
