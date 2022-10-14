@@ -6,24 +6,22 @@ const db = require("../models");
 const axios = require("axios");
 const UTILITIES = db.utilities;
 
-// Hello World
-
 const generateRequestId = () => {
   const str = (new Date()).toLocaleString("en-US", { timeZone: "Africa/Lagos" });
   let date = new Date(str);
   const y = date.getFullYear();
-  const m = `0${ (date.getMonth() + 1) }`.slice(-2);
-  const d = `0${ date.getDate().toString() }`.slice(-2);
-  const h = `0${ date.getHours().toString() }`.slice(-2);
-  const min = `0${ date.getMinutes().toString() }`.slice(-2);
-  return `${ y }${ m }${ d }${ h }${ min }${ Math.random().toString(36).slice(2) }`;
+  const m = `0${(date.getMonth() + 1)}`.slice(-2);
+  const d = `0${date.getDate().toString()}`.slice(-2);
+  const h = `0${date.getHours().toString()}`.slice(-2);
+  const min = `0${date.getMinutes().toString()}`.slice(-2);
+  return `${y}${m}${d}${h}${min}${Math.random().toString(36).slice(2)}`;
 };
 
 const airtime = async (req, res) => {
   const { serviceID, amount, phone } = req.body;
   try {
     const VT = await axios.post(
-      `${ LIVE_URL }`,
+      `${LIVE_URL}`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -45,10 +43,10 @@ const airtime = async (req, res) => {
 };
 
 const international = async (req, res) => {
-  try{
+  try {
     const { serviceID, amount, phone, billersCode, variation_code, operator_id, country_code, product_type_id, email } = req.body;
     const VT = await axios.post(
-      `${ LIVE_URL }`,
+      `${LIVE_URL}`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -64,8 +62,8 @@ const international = async (req, res) => {
       { auth: { username, password } }
     );
     res.status(200).json({ data: VT.data, status: true });
-  } catch(error){
-    console.log({error});
+  } catch (error) {
+    console.log({ error });
     res.status(500).json({ error, status: false });
   }
 }
@@ -74,7 +72,7 @@ const data_subscripton = async (req, res) => {
   const { serviceID, amount, phone, billersCode, variation_code } = req.body;
   try {
     const VT = await axios.post(
-      `${ LIVE_URL }`,
+      `${LIVE_URL}`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -88,12 +86,12 @@ const data_subscripton = async (req, res) => {
     let content = VT.data.content.transactions
     console.log(VT.data)
     const db_data = await UTILITIES.create({
-       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+      phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
 
     res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
-    console.log({error});
+    console.log({ error });
     res.status(500).json({ error, status: false });
   }
 };
@@ -101,7 +99,7 @@ const data_subscripton = async (req, res) => {
 const data_variation_codes = async (req, res) => {
   const { network } = req.body;
   try {
-    const VT = await axios.get(`https://vtpass.com/api/service-variations?serviceID=${ network }`);
+    const VT = await axios.get(`https://vtpass.com/api/service-variations?serviceID=${network}`);
     res.status(200).json({ data: VT.data });
   } catch (error) {
     res.status(500).json({ error });
@@ -112,11 +110,11 @@ const cabletv_variation_codes = async (req, res) => {
   const { serviceID } = req.body;
   try {
     const VT = await axios.get(
-      `https://vtpass.com/api/service-variations?serviceID=${ serviceID }`
+      `https://vtpass.com/api/service-variations?serviceID=${serviceID}`
     );
     res.status(200).json({ data: VT.data });
   } catch (error) {
-    console.log({error});
+    console.log({ error });
     res.status(500).json({ error });
   }
 };
@@ -131,7 +129,7 @@ const verify_smartcard_number = async (req, res) => {
     );
     res.status(200).json({ data: VT.data, status: true });
   } catch (error) {
-    console.log({error});
+    console.log({ error });
     res.status(500).json({ error, status: false });
   }
 };
@@ -140,7 +138,7 @@ const renew_catbletv_sub = async (req, res) => {
   const { serviceID, billersCode, amount, phone, variation_code } = req.body;
   try {
     const VT = await axios.post(
-      `${ LIVE_URL }`,
+      `${LIVE_URL}`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -156,12 +154,12 @@ const renew_catbletv_sub = async (req, res) => {
     let content = VT.data.content.transactions
     console.log(VT.data)
     const db_data = await UTILITIES.create({
-       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+      phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
 
     res.status(200).json({ data: VT.data });
   } catch (error) {
-    console.log({error});
+    console.log({ error });
     res.status(500).json({ error });
   }
 };
@@ -176,7 +174,7 @@ const verify_meter_number = async (req, res) => {
     );
     res.status(200).json({ data: VT.data });
   } catch (error) {
-    console.log({error});
+    console.log({ error });
     res.status(500).json({ error });
   }
 };
@@ -185,7 +183,7 @@ const renew_meter_subscription = async (req, res) => {
   const { serviceID, billersCode, amount, phone, variation_code } = req.body;
   try {
     const VT = await axios.post(
-      `${ LIVE_URL }`,
+      `${LIVE_URL}`,
       {
         request_id: generateRequestId(),
         serviceID,
@@ -199,25 +197,25 @@ const renew_meter_subscription = async (req, res) => {
     let content = VT.data.content.transactions
     console.log(VT.data)
     const db_data = await UTILITIES.create({
-       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+      phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
     res.status(200).json({ data: VT.data });
   } catch (error) {
-    console.log({error});
+    console.log({ error });
     res.status(500).json({ error });
   }
 };
 
 const query_status = async (req, res) => {
-  const {request_id} = req.body;
-  try{
+  const { request_id } = req.body;
+  try {
     const VT = await axios.post(
       `https://vtpass.com/api/requery`,
       { request_id },
       { auth: { username, password } }
     );
-  } catch(error){
-    console.log({error});
+  } catch (error) {
+    console.log({ error });
     res.status(500).json({ error });
   }
 }
