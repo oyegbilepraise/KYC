@@ -26,10 +26,10 @@ sequelize
 
 const db = {};
 
-db.kyc = require("./kycModel")(sequelize, DataTypes);
-db.agent = require("./Agent")(sequelize, DataTypes);
-db.cc_kyc = require("./cc_kyc")(sequelize, DataTypes);
-db.utilities = require("./morewidget")(sequelize, DataTypes);
+// db.kyc = require("./kycModel")(sequelize, DataTypes);
+// db.agent = require("./Agent")(sequelize, DataTypes);
+// db.cc_kyc = require("./cc_kyc")(sequelize, DataTypes);
+// db.utilities = require("./morewidget")(sequelize, DataTypes);
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
