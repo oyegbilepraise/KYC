@@ -60,10 +60,10 @@ const get_query_product_by_aggregator = async (req, res) => {
 }
 
 const loan_application = async (req, res) => {
-  const identity_number = uuidv4();
+  // const identity_number = uuidv4();
   const aggregator_loan_ref = uuidv4();
 
-  const { last_name, first_name, bank_account_name, email, phone_number, gender, photo_url, residence_address, city, state, date_of_birth, borrower_type, company_name, registration_number, company_address, company_city, company_state, bank_account_num, bank_code, product_id, sector_code, country_code, loan_tenure, loan_amount, annual_interest_rate, loan_purpose, customer_category, create_wallet, BVN, bvn } = req.body;
+  const { last_name, first_name, bank_account_name, email, phone_number, gender, photo_url, residence_address, city, state, date_of_birth, borrower_type, company_name, registration_number, company_address, company_city, company_state, bank_account_num, bank_code, product_id, sector_code, country_code, loan_tenure, loan_amount, annual_interest_rate, loan_purpose, customer_category, create_wallet, identity_number, BVN, bvn } = req.body;
 
   try {
     const response = await axios.post(`${TEST_URL}account/loan_application`, { last_name, first_name, bank_account_name, email, phone_number, gender, photo_url, residence_address, city, state, date_of_birth, borrower_type, company_name, identity_number, registration_number, company_address, company_city, company_state, bank_account_num, bank_code, aggregator_loan_ref, product_id, sector_code, country_code, loan_tenure, loan_amount, annual_interest_rate, loan_purpose, customer_category, create_wallet, BVN, bvn }, {
@@ -73,8 +73,9 @@ const loan_application = async (req, res) => {
     })
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
   } catch (error) {
+    console.log(error);
     console.log(error.response.data.message);
-    res.status(500).json({ message: error?.response?.data?.message, status: false, error: true });
+    res.status(500).json({ message: error?.response?.data, status: false, error: true, payload: req.body });
   }
 }
 
