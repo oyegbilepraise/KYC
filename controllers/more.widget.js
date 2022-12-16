@@ -31,13 +31,13 @@ const airtime = async (req, res) => {
       { auth: { username, password } }
     );
     console.log(VT.data)
-    let content = VT.data.content.transactions
+    let content = VT?.data?.content?.transactions
     const db_data = await UTILITIES.create({
-      phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type
     })
     res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
-    console.log({error});
+    console.log({ error });
     res.status(500).json({ error, status: false });
   }
 };
@@ -63,7 +63,6 @@ const international = async (req, res) => {
     );
     res.status(200).json({ data: VT.data, status: true });
   } catch (error) {
-    console.log({ error });
     res.status(500).json({ error, status: false });
   }
 }
@@ -83,10 +82,9 @@ const data_subscripton = async (req, res) => {
       },
       { auth: { username, password } }
     );
-    let content = VT.data.content.transactions
-    console.log(VT.data)
+    let content = VT?.data?.content?.transactions
     const db_data = await UTILITIES.create({
-      phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type
     })
 
     res.status(200).json({ data: VT.data, status: true, db_data });
@@ -151,13 +149,13 @@ const renew_catbletv_sub = async (req, res) => {
       { auth: { username, password } }
     );
 
-    let content = VT.data.content.transactions
+    let content = VT?.data?.content?.transactions
     console.log(VT.data)
     const db_data = await UTILITIES.create({
-      phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
+      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type
     })
 
-    res.status(200).json({ data: VT.data });
+    res.status(200).json({ data: VT.data, db_data, status: true });
   } catch (error) {
     console.log({ error });
     res.status(500).json({ error });
@@ -199,7 +197,7 @@ const renew_meter_subscription = async (req, res) => {
     const db_data = await UTILITIES.create({
       phone, amount, status: content.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content.product_name, transactionId: content.transactionId, type: content.type
     })
-    res.status(200).json({ data: VT.data });
+    res.status(200).json({ data: VT.data, db_data, status: true });
   } catch (error) {
     console.log({ error });
     res.status(500).json({ error });
