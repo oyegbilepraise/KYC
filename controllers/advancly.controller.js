@@ -1,16 +1,16 @@
 const axios = require("axios");
-const TEST_URL = "https://api-sandbox.advancly.com/api/v1/";
+const TEST_URL = "https://advancly-api-master.staging.vggdev.com/api/v1/";
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require('uuid');
 
 
 
-const Username = process.env.VT_USERNAME;
-const password = process.env.VT_PASSWORD;
+const Username = process.env.advancly_username;
+const password = process.env.advancly_password;
 
 const login = async () => {
   try {
-    const res = await axios.post('https://api-sandbox.advancly.com/api/v1/account/custom_login', { Username, password })
+    const res = await axios.post(`${TEST_URL}account/custom_login`, { Username, password })
     return res.data.sso_auth_token;
   } catch (error) {
     console.log(error);
@@ -53,9 +53,10 @@ const get_query_product_by_aggregator = async (req, res) => {
         Authorization: "Bearer " + (await login()),
       },
     })
-    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data, token: login() })
   } catch (error) {
-    res.status(500).json({ error: error.response.data || 'An error Occured', status: false, error: true });
+    console.log(error.response.data);
+    res.status(500).json({ advancly: error.response.data || 'An error Occured', status: false, error: true, token: login() });
   }
 }
 
@@ -71,15 +72,30 @@ const loan_application = async (req, res) => {
         Authorization: "Bearer " + (await login()),
       },
     })
-    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
+    console.log(response.data);
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data, aggregator_loan_ref })
   } catch (error) {
-    console.log(error);
     console.log(error.response.data.message);
     res.status(500).json({ message: error?.response?.data, status: false, error: true, payload: req.body });
   }
 }
 
-module.exports = { get_country_state, get_country_bank_list, get_sectors, get_query_product_by_aggregator, loan_application };
+const get_loan_by_refrence = async (req, res) => {
+  const { loan_ref, aggregator_loan_ref } = req.body;
+  try {
+    const response = await axios.get(`${TEST_URL}eco/agg_search_loans?loan_ref=${loan_ref}&aggregator_loan_ref=${aggregator_loan_ref}`, {
+      headers: {
+        Authorization: "Bearer " + (await login()),
+      },
+    })
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
+  } catch (error) {
+    console.log(error.response.data.message);
+    res.status(500).json({ message: error?.response?.data, status: false, error: true, });
+  }
+}
+
+module.exports = { get_country_state, get_country_bank_list, get_sectors, get_query_product_by_aggregator, loan_application, get_loan_by_refrence };
 
 // {
 //   "last_name": "Oyegbile",
