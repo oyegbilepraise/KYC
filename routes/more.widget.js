@@ -11,5 +11,6 @@ router.post("/renew_catbletv_sub", moreController.renew_catbletv_sub);
 router.post("/verify_meter_number", moreController.verify_meter_number);
 router.post("/renew_meter_subscription", moreController.renew_meter_subscription);
 router.post("/query_status", moreController.query_status);
+router.get('/get_utilities', moreController.get_utilities);
 
 module.exports = router;

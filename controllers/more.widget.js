@@ -218,6 +218,16 @@ const query_status = async (req, res) => {
   }
 }
 
+const get_utilities = async (req, res) => {
+  try {
+    const response = await UTILITIES.findAll();
+    res.status(200).json({ data: response, error: false, message:'Success', status: true });
+  } catch (error) {
+    res.status(500).json({ error });
+
+  }
+}
+
 module.exports = {
   airtime,
   data_variation_codes,
@@ -228,5 +238,6 @@ module.exports = {
   verify_meter_number,
   renew_meter_subscription,
   international,
-  query_status
+  query_status,
+  get_utilities
 };
