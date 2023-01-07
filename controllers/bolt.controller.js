@@ -85,6 +85,8 @@ const addPeopleProfile = async (req, res) => {
             },
         });
 
+        await BOLT.create({...req.body})
+
         res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data })
     } catch (error) {
         res.status(500).json({ error: error.response.data || 'An error Occured', status: false, error: true });
