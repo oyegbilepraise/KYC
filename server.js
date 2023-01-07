@@ -19,10 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 const kycRoute = require("./routes/kycRoutes");
 const more_widget = require("./routes/more.widget");
 const advancly = require("./routes/advancly.routes");
+const bolt = require("./routes/bolt.routes");
 
 app.use("/api", kycRoute);
 app.use("/api/more-widget", more_widget);
 app.use("/api/advancly", advancly);
+app.use("/api/bolt", bolt);
 
 // testing...
 
