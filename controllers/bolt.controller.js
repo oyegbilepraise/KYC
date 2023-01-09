@@ -18,7 +18,6 @@ const login = async () => {
     }
     try {
         const res = await axios.post(`https://oidc.bolt.eu/token`, qs.stringify(body), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-        console.log(res.data);
         return res.data.access_token;
     } catch (error) {
         console.log(error);
@@ -36,8 +35,7 @@ const getActivePeople = async (req, res) => {
 
         res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
     } catch (error) {
-        res.json({ token: login() })
-        // res.status(500).json({ error: error.response.data || 'An error Occured', status: false, error: true, token: login() });
+        res.json({ error: true, status: false, message: error?.response?.data || 'An error occurred'})
     }
 }
 
