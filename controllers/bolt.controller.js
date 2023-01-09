@@ -74,12 +74,9 @@ const updatePeopleProfile = async (req, res) => {
 }
 
 const addPeopleProfile = async (req, res) => {
-    const { last_name, email, first_name, phone } = req.body;
-
-    const external_group_id = uuidv4()
-
+    const { last_name, email, first_name, phone, external_group_id } = req.body;
     try {
-        const response = await axios.post('https://node.taxify.eu/business-integration/businessIntegration/v2/addorActivatePerson', { user: { email, first_name, phone, last_name }, user_group: { external_group_id: 'cc_four_k' } }, {
+        const response = await axios.post('https://node.taxify.eu/business-integration/businessIntegration/v2/addorActivatePerson', { user: { email, first_name, phone, last_name }, user_group: { external_group_id } }, {
             headers: {
                 Authorization: "Bearer " + (await login()),
             },
