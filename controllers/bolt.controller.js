@@ -1,6 +1,6 @@
 const axios = require("axios");
 const TEST_URL = "https://advancly-api-master.staging.vggdev.com/api/v1/";
-const { Sequelize } = require("sequelize");
+const { Sequelize, json } = require("sequelize");
 const { v4: uuidv4 } = require('uuid');
 const qs = require('querystring')
 
@@ -17,8 +17,9 @@ const login = async () => {
         client_id, client_secret, grant_type: 'client_credentials', scope: 'business-integrations:api'
     }
     try {
-        const res = await axios.post(`https://oidc.bolt.eu/token`, qs.stringify(body), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-        return res.data.access_token;
+        const resi = await axios.post(`https://oidc.bolt.eu/token`, qs.stringify(body), { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+        // res.json({data: resi.data.access_token})
+        return resi.data.access_token;
     } catch (error) {
         console.log(error);
         console.log(error?.response?.data);
@@ -48,7 +49,7 @@ const deactivatePeople = async (req, res) => {
             },
         });
 
-        res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data });
+        res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data, });
     } catch (error) {
         console.log(error?.response?.data);
         res.status(500).json({ error: error?.response?.data || 'An error Occured', status: false, error: true });
