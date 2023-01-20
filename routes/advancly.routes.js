@@ -14,6 +14,8 @@ router.post('/get_loan_by_refrence', advanclyController.get_loan_by_refrence);
 router.post('/save_security_question', advanclyController.save_security_question);
 router.post('/set_pin', advanclyController.set_pin);
 router.post('/reset_pin', advanclyController.reset_pin);
+router.post('/get_wallet_transactions', advanclyController.get_wallet_transactions);
+router.post('/withdraw_funds', advanclyController.withdraw_funds);
 
 
 module.exports = router;

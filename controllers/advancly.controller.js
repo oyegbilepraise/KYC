@@ -119,8 +119,20 @@ const get_signed_banks = async (req, res) => {
 const get_default_wallet = async (req, res) => {
   const { customer_id, phone_number, email } = req.body;
   try {
-    const response = await axios.get(`${TEST_URL_V2}client/wallet/default/${customer_id}?phone=${phone_number}&email=${email}`, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
+    const response = await axios.get(`${TEST_URL_V2}client/wallet/default?customer_id=${customer_id}`, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
+  } catch (error) {
+    console.log(error?.response?.data);
+    res.status(500).json({ message: error?.response?.data, status: false, error: true });
+  }
+}
+
+const get_wallet_transactions = async (req, res) => {
+  const { account_number } = req.body;
+
+  try {
+    const response = await axios.get(`${TEST_URL_V2}client/wallet/wallet_transactions?account_number=${account_number}`, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data })
   } catch (error) {
     console.log(error?.response?.data);
     res.status(500).json({ message: error?.response?.data, status: false, error: true });
@@ -162,4 +174,16 @@ const reset_pin = async (req, res) => {
     res.status(500).json({ message: error?.response?.data, status: false, error: true });
   }
 }
-module.exports = { get_country_state, get_country_bank_list, get_sectors, get_query_product_by_aggregator, loan_application, get_loan_by_refrence, get_seccurity_questions, get_signed_banks, get_default_wallet, save_security_question, set_pin, reset_pin };
+
+const withdraw_funds = async (req, res) => {
+  const { sender_account_number, sender_wallet_id, customer_id, recipient_account_number, recipient_bank_code, amount, pin, comment } = req.body;
+  try {
+    const response = await axios.post(`${TEST_URL_V2}client/wallet/withdraw_funds`, { sender_account_number, sender_wallet_id, customer_id, recipient_account_number, recipient_bank_code, amount, pin, comment }, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data })
+  } catch (error) {
+    console.log(error?.response?.data);
+    res.status(500).json({ message: error?.response?.data, status: false, error: true });
+  }
+}
+
+module.exports = { get_country_state, get_country_bank_list, get_sectors, get_query_product_by_aggregator, loan_application, get_loan_by_refrence, get_seccurity_questions, get_signed_banks, get_default_wallet, save_security_question, set_pin, reset_pin, get_wallet_transactions, withdraw_funds }
