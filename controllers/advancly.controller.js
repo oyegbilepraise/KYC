@@ -149,4 +149,17 @@ const set_pin = async (req, res) => {
     res.status(500).json({ message: error?.response?.data, status: false, error: true });
   }
 }
-module.exports = { get_country_state, get_country_bank_list, get_sectors, get_query_product_by_aggregator, loan_application, get_loan_by_refrence, get_seccurity_questions, get_signed_banks, get_default_wallet, save_security_question, set_pin };
+
+// {{baseUrl}}/api/v2/client/wallet/reset_pin
+
+const reset_pin = async (req, res) => {
+  const { question_id, answer, customer_id, aggregator_id, pin } = req.body;
+  try {
+    const response = await axios.post(`${TEST_URL_V2}client/wallet/reset_pin`, { pin, customer_id, aggregator_id, answer, question_id }, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data })
+  } catch (error) {
+    console.log(error?.response?.data);
+    res.status(500).json({ message: error?.response?.data, status: false, error: true });
+  }
+}
+module.exports = { get_country_state, get_country_bank_list, get_sectors, get_query_product_by_aggregator, loan_application, get_loan_by_refrence, get_seccurity_questions, get_signed_banks, get_default_wallet, save_security_question, set_pin, reset_pin };

@@ -13,6 +13,7 @@ router.post('/get_default_wallet', advanclyController.get_default_wallet);
 router.post('/get_loan_by_refrence', advanclyController.get_loan_by_refrence);
 router.post('/save_security_question', advanclyController.save_security_question);
 router.post('/set_pin', advanclyController.set_pin);
+router.post('/reset_pin', advanclyController.reset_pin);
 
 
 module.exports = router;
