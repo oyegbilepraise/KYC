@@ -128,9 +128,8 @@ const get_default_wallet = async (req, res) => {
 
 const get_wallet_transactions = async (req, res) => {
   const { account_number } = req.body;
-
   try {
-    const response = await axios.get(`${TEST_URL_V2}client/wallet/wallet_transactions?account_number=${account_number}`, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
+    const response = await axios.get(`${TEST_URL_V2}client/wallet/wallet_transactions/${account_number}`, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data })
   } catch (error) {
     console.log(error?.response?.data);
