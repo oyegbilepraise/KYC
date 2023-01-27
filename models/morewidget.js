@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
     smart_card_no: { type: DataTypes.STRING, required: false },
     subscription_type: { type: DataTypes.STRING, required: false },
     meter_number: { type: DataTypes.STRING, required: false },
-    transactionId: {type: DataTypes.STRING, required: false},
+    transactionId: { type: DataTypes.STRING, required: false },
+    source: { type: DataTypes.STRING, required: true },
   });
   return UTILITIES;
 };
