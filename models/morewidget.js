@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     meter_number: { type: DataTypes.STRING, required: false },
     transactionId: { type: DataTypes.STRING, required: false },
     source: { type: DataTypes.STRING, required: true },
+    merchant_id: { type: DataTypes.STRING, required: false },
   });
   return UTILITIES;
 };
