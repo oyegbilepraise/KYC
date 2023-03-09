@@ -1,29 +1,29 @@
 const axios = require("axios");
 const TEST_URL = "https://advancly-api-master.staging.vggdev.com/api/v1/";
 const TEST_URL_V2 = "https://advancly-api-master.staging.vggdev.com/api/v2/"
-const LIVE_URL = 'https://api.advancly.com/api/v1'
+const LIVE_URL = 'https://api.advancly.com/api/v1/'
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require('uuid');
 const shortid = require("shortid");
 
-const Username = process.env.advancly_username;
+const username = process.env.advancly_username;
 const password = process.env.advancly_password;
 const advanclt_client_id = process.env.advanclt_client_id;
 const advancly_api_key = process.env.advancly_api_key;
 
 const login = async () => {
   try {
-    const res = await axios.post(`${TEST_URL}account/custom_login`, { Username, password })
+    const res = await axios.post(`${LIVE_URL}account/custom_login`, { username, password })
     return res.data.sso_auth_token;
   } catch (error) {
-    console.log(error);
+    console.log(error?.response?.data);
   }
 }
 
 const get_country_state = async (req, res) => {
   const { country_code } = req.body;
   try {
-    const response = await axios.get(`${TEST_URL}account/all_state?country_code=${country_code}`)
+    const response = await axios.get(`${LIVE_URL}account/all_state?country_code=${country_code}`)
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
   } catch (error) {
     res.status(500).json({ error: error.response.data || 'An error Occured', status: false, errors: true });
@@ -33,7 +33,7 @@ const get_country_state = async (req, res) => {
 const get_country_bank_list = async (req, res) => {
   const { country_code } = req.body;
   try {
-    const response = await axios.get(`${TEST_URL}account/signed_banks_country?country_code=${country_code}`)
+    const response = await axios.get(`${LIVE_URL}account/signed_banks_country?country_code=${country_code}`)
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
   } catch (error) {
     res.status(500).json({ error: error.response.data || 'An error Occured', status: false, errors: true });
@@ -42,7 +42,7 @@ const get_country_bank_list = async (req, res) => {
 
 const get_sectors = async (req, res) => {
   try {
-    const response = await axios.get(`${TEST_URL}misc/sectors`)
+    const response = await axios.get(`${LIVE_URL}misc/sectors`)
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
   } catch (error) {
     res.status(500).json({ error: error.response.data || 'An error Occured', status: false, errors: true });
@@ -51,12 +51,13 @@ const get_sectors = async (req, res) => {
 
 const get_query_product_by_aggregator = async (req, res) => {
   try {
-    const response = await axios.get(`${TEST_URL}misc/query_product_by_aggregator`, {
+    const response = await axios.get(`${LIVE_URL}misc/query_product_by_aggregator`, {
       headers: {
         Authorization: "Bearer " + (await login()),
       },
     })
-    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data, token: login() })
+
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data.data })
   } catch (error) {
     console.log(error?.response?.data);
     res.status(500).json({ advancly: error.response.data || 'An error Occured', status: false, errors: true, });
@@ -96,7 +97,7 @@ const get_deatils_by_id = async (token) => {
 }
 
 const getCcRequestDetails = async (token, request_id) => {
-  console.log({token, request_id});
+  console.log({ token, request_id });
   const res = await axios.post('https://mobile.creditclan.com/api/v3/loan/details', { token, request_id },
     {
       headers: ({ 'x-api-key': 'WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228' })
@@ -118,11 +119,9 @@ const loan_application = async (req, res) => {
     let bank_account = data.accounts[data.accounts.length - 1];
     let { profile, home_address, work } = data;
 
-    let payload = {
-      last_name: name[1], first_name: name[0], bank_account_name: bank_account.card_name, email: profile.email, phone_number: phone, gender: profile.gender === '0' ? 'Male' : 'Female', photo_url: profile.file_name, residence_address: home_address.home_address, city: home_address.lga_text, state: home_address.home_state_text, date_of_birth: profile.date_of_birth, borrower_type: 1, bank_account_num: bank_account.last_four_digits, bank_code: bank_account.bank_code, aggregator_loan_ref, product_id: 94, sector_code: '10', country_code: 'NG', loan_tenure: (+cc_details.loandetails.REQUEST_TENOR) * 30 || 30, loan_amount: cc_details.loandetails.REQUEST_PRINCIPAL, annual_interest_rate: 90, loan_purpose: 'Merchant Upfront Finance', customer_category: "IT", create_wallet: true, bvn: (profile.bvn), identity_number: profile.bvn
-    }
+    console.log(cc_details.loandetails);
 
-    const response = await axios.post(`${LIVE_URL}account/loan_application`, { last_name: name[1], first_name: name[0], bank_account_name: bank_account.card_name, email: profile.email, phone_number: phone, gender: profile.gender === '0' ? 'Male' : 'Female', photo_url: profile.file_name, residence_address: home_address.home_address, city: home_address.home_state, state: home_address.home_state_text, date_of_birth: profile.date_of_birth, borrower_type: 1, bank_account_num: bank_account.last_four_digits, bank_code: bank_account.bank_code, aggregator_loan_ref, product_id: 94, sector_code: '2', country_code: 'NG', loan_tenure: (+cc_details.loandetails.REQUEST_TENOR) * 30, loan_amount: cc_details.loandetails.REQUEST_PRINCIPAL, annual_interest_rate, loan_purpose, customer_category: "IT", create_wallet: true, bvn: (profile.bvn), identity_number: profile.bvn }, {
+    const response = await axios.post(`${LIVE_URL}account/loan_application`, { last_name: name[1], first_name: name[0], bank_account_name: bank_account.card_name, email: profile.email, phone_number: phone, gender: profile.gender === '0' ? 'Male' : 'Female', photo_url: profile.file_name, residence_address: home_address.home_address, city: home_address.home_lga_text, state: home_address.home_state_text, date_of_birth: profile.date_of_birth, borrower_type: 1, bank_account_num: bank_account.last_four_digits, bank_code: bank_account.bank_code, aggregator_loan_ref, product_id: 63, sector_code: '10', country_code: 'NG', loan_tenure: (+cc_details.loandetails.REQUEST_TENOR) * 30 || 30, loan_amount: (+cc_details.loandetails.REQUEST_PRINCIPAL), annual_interest_rate: 90, loan_purpose: 'Merchant Upfront Finance', customer_category: "IT", create_wallet: true, bvn: (profile.bvn), identity_number: profile.bvn }, {
       headers: {
         Authorization: "Bearer " + (await login()),
         // 'client-id': advanclt_client_id,
@@ -130,19 +129,19 @@ const loan_application = async (req, res) => {
       },
     })
 
-    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data, aggregator_loan_ref });
+    res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data });
 
   } catch (error) {
     console.log({ error });
     console.log(error?.response?.data);
-    res.status(500).json({ message: error?.response?.data, status: false, error: true });
+    res.status(500).json({ message: error?.response?.data, status: false, error: true, token: await login() });
   }
 }
 
 const get_loan_by_refrence = async (req, res) => {
   const { loan_ref, aggregator_loan_ref } = req.body;
   try {
-    const response = await axios.get(`${TEST_URL}eco/agg_search_loans?loan_ref=${loan_ref}&aggregator_loan_ref=${aggregator_loan_ref}`, {
+    const response = await axios.get(`${LIVE_URL}eco/agg_search_loans?loan_ref=${loan_ref}&aggregator_loan_ref=${aggregator_loan_ref}`, {
       headers: {
         Authorization: "Bearer " + (await login()),
       },
@@ -233,7 +232,7 @@ const reset_pin = async (req, res) => {
 const withdraw_funds = async (req, res) => {
   const { sender_account_number, sender_wallet_id, customer_id, recipient_account_number, recipient_bank_code, amount, pin, comment } = req.body;
   try {
-    const response = await axios.post(`${TEST_URL_V2}client/wallet/withdraw_funds`, { sender_account_number, sender_wallet_id, customer_id, recipient_account_number, recipient_bank_code, amount, pin, comment }, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
+    const response = await axios.post(`${LIVE_URL}client/wallet/withdraw_funds`, { sender_account_number, sender_wallet_id, customer_id, recipient_account_number, recipient_bank_code, amount, pin, comment }, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data })
   } catch (error) {
     console.log(error?.response?.data);
@@ -244,7 +243,7 @@ const withdraw_funds = async (req, res) => {
 const loan_repayment = async (req, res) => {
   const { loan_ref_no, amount } = req.body;
   try {
-    const response = await axios.post(`${TEST_URL_V2}client/loans/initiate_repayment`, { loan_ref_no, amount }, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
+    const response = await axios.post(`${LIVE_URL}client/loans/initiate_repayment`, { loan_ref_no, amount }, { headers: { 'client-id': advanclt_client_id, 'api-key': advancly_api_key } });
     res.status(200).json({ status: true, statusCode: 200, error: false, message: 'Success', data: response.data })
   } catch (error) {
     console.log(error?.response?.data);
