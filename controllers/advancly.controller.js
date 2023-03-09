@@ -1,6 +1,7 @@
 const axios = require("axios");
 const TEST_URL = "https://advancly-api-master.staging.vggdev.com/api/v1/";
 const TEST_URL_V2 = "https://advancly-api-master.staging.vggdev.com/api/v2/"
+const LIVE_URL = 'https://api.advancly.com/api/v1'
 const { Sequelize } = require("sequelize");
 const { v4: uuidv4 } = require('uuid');
 const shortid = require("shortid");
@@ -62,11 +63,11 @@ const get_query_product_by_aggregator = async (req, res) => {
   }
 }
 
-const get_details = async (phone, email) => {
+const get_details = async (phone) => {
   try {
     const res = await axios.post(
       'https://mobile.creditclan.com/api/v3/customer/check/details', {
-      phone, email
+      phone
     }, { headers: { 'x-api-key': 'WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228' } });
 
     return res?.data?.token;
@@ -95,6 +96,7 @@ const get_deatils_by_id = async (token) => {
 }
 
 const getCcRequestDetails = async (token, request_id) => {
+  console.log({token, request_id});
   const res = await axios.post('https://mobile.creditclan.com/api/v3/loan/details', { token, request_id },
     {
       headers: ({ 'x-api-key': 'WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228' })
@@ -103,20 +105,24 @@ const getCcRequestDetails = async (token, request_id) => {
 }
 
 const loan_application = async (req, res) => {
-  const { phone, email, token, request_id, loan_tenure, annual_interest_rate, loan_purpose, customer_category } = req.body;
+  const { phone, request_id } = req.body;
 
   const aggregator_loan_ref = uuidv4();
 
   try {
-    const d = await get_details(phone, email);
+    const d = await get_details(phone);
     const { data } = await get_deatils_by_id(d);
-    const cc_details = await getCcRequestDetails(token, request_id);
+    const cc_details = await getCcRequestDetails(d, request_id);
 
     let name = data.profile.legal_name.split(' ');
     let bank_account = data.accounts[data.accounts.length - 1];
     let { profile, home_address, work } = data;
 
-    const response = await axios.post(`${TEST_URL}account/loan_application`, { last_name: name[1], first_name: name[0], bank_account_name: bank_account.card_name, email: profile.email, phone_number: phone, gender: profile.gender === '0' ? 'Male' : 'Female', photo_url: profile.file_name, residence_address: home_address.home_address, city: home_address.home_state, state: home_address.home_state_text, date_of_birth: profile.date_of_birth, borrower_type: 1, bank_account_num: bank_account.last_four_digits, bank_code: bank_account.bank_code, aggregator_loan_ref, product_id: 94, sector_code: '2', country_code: 'NG', loan_tenure, loan_amount: cc_details.loandetails.REQUEST_PRINCIPAL, annual_interest_rate, loan_purpose, customer_category, create_wallet: true, bvn: (profile.bvn), identity_number: profile.bvn }, {
+    let payload = {
+      last_name: name[1], first_name: name[0], bank_account_name: bank_account.card_name, email: profile.email, phone_number: phone, gender: profile.gender === '0' ? 'Male' : 'Female', photo_url: profile.file_name, residence_address: home_address.home_address, city: home_address.lga_text, state: home_address.home_state_text, date_of_birth: profile.date_of_birth, borrower_type: 1, bank_account_num: bank_account.last_four_digits, bank_code: bank_account.bank_code, aggregator_loan_ref, product_id: 94, sector_code: '10', country_code: 'NG', loan_tenure: (+cc_details.loandetails.REQUEST_TENOR) * 30 || 30, loan_amount: cc_details.loandetails.REQUEST_PRINCIPAL, annual_interest_rate: 90, loan_purpose: 'Merchant Upfront Finance', customer_category: "IT", create_wallet: true, bvn: (profile.bvn), identity_number: profile.bvn
+    }
+
+    const response = await axios.post(`${LIVE_URL}account/loan_application`, { last_name: name[1], first_name: name[0], bank_account_name: bank_account.card_name, email: profile.email, phone_number: phone, gender: profile.gender === '0' ? 'Male' : 'Female', photo_url: profile.file_name, residence_address: home_address.home_address, city: home_address.home_state, state: home_address.home_state_text, date_of_birth: profile.date_of_birth, borrower_type: 1, bank_account_num: bank_account.last_four_digits, bank_code: bank_account.bank_code, aggregator_loan_ref, product_id: 94, sector_code: '2', country_code: 'NG', loan_tenure: (+cc_details.loandetails.REQUEST_TENOR) * 30, loan_amount: cc_details.loandetails.REQUEST_PRINCIPAL, annual_interest_rate, loan_purpose, customer_category: "IT", create_wallet: true, bvn: (profile.bvn), identity_number: profile.bvn }, {
       headers: {
         Authorization: "Bearer " + (await login()),
         // 'client-id': advanclt_client_id,
