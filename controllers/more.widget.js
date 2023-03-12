@@ -35,7 +35,7 @@ const airtime = async (req, res) => {
     }
     let content = VT?.data?.content?.transactions
     const db_data = await UTILITIES.create({
-      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type, source, merchant_id
+      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
     })
     res.status(200).json({ data: VT.data.content, status: true, db_data });
   } catch (error) {
@@ -89,7 +89,7 @@ const data_subscripton = async (req, res) => {
     }
     let content = VT?.data?.content?.transactions
     const db_data = await UTILITIES.create({
-      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type, source, merchant_id
+      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
     })
 
     res.status(200).json({ data: VT.data, status: true, db_data });
