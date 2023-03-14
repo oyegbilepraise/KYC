@@ -12,5 +12,6 @@ router.post("/verify_meter_number", moreController.verify_meter_number);
 router.post("/renew_meter_subscription", moreController.renew_meter_subscription);
 router.post("/query_status", moreController.query_status);
 router.get('/get_utilities', moreController.get_utilities);
+router.get('/get_flutterwave_bills_categories', moreController.get_flutterwave_bills_categories);
 
 module.exports = router;

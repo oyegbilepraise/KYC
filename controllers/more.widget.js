@@ -6,6 +6,19 @@ const db = require("../models");
 const axios = require("axios");
 const UTILITIES = db.utilities;
 
+const Flutterwave = require("flutterwave-node-v3");
+const flw = new Flutterwave(process.env.flutterwave_public_key, process.env.flutterwave_sec_key);
+
+const get_flutterwave_bills_categories = async (req, res) => {
+  try {
+    const resi = await flw.Bills.fetch_bills_Cat();
+    res.status(200).json(resi)
+  } catch (error) {
+    res.status(500).json({ error })
+    console.log({ error });
+  }
+}
+
 const generateRequestId = () => {
   const str = (new Date()).toLocaleString("en-US", { timeZone: "Africa/Lagos" });
   let date = new Date(str);
@@ -123,14 +136,11 @@ const cabletv_variation_codes = async (req, res) => {
 };
 
 const verify_smartcard_number = async (req, res) => {
-  const { serviceID, billersCode } = req.body;
+  const { item_code, code, customer } = req.body;
   try {
-    const VT = await axios.post(
-      `https://vtpass.com/api/merchant-verify`,
-      { billersCode, serviceID },
-      { auth: { username, password } }
-    );
-    res.status(200).json({ data: VT.data, status: true });
+    const payload = { item_code, code, customer };
+    const response = await flw.Bills.validate(payload);
+    res.status(200).json(response);
   } catch (error) {
     console.log({ error });
     res.status(500).json({ error, status: false });
@@ -247,5 +257,6 @@ module.exports = {
   renew_meter_subscription,
   international,
   query_status,
-  get_utilities
+  get_utilities,
+  get_flutterwave_bills_categories
 };
