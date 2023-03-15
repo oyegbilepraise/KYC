@@ -143,38 +143,27 @@ const verify_smartcard_number = async (req, res) => {
     res.status(200).json(response);
   } catch (error) {
     console.log({ error });
-    res.status(500).json({ error, status: false });
+    res.status(500).json({ message: error?.response?.data, status: false });
   }
 };
 
 const renew_catbletv_sub = async (req, res) => {
-  const { serviceID, billersCode, amount, phone, variation_code, source, merchant_id } = req.body;
+  const { customer, amount, type } = req.body;
   try {
-    const VT = await axios.post(
-      `${LIVE_URL}`,
-      {
-        request_id: generateRequestId(),
-        serviceID,
-        amount,
-        phone,
-        billersCode,
-        subscription_type: "renew",
-        variation_code
-      },
-      { auth: { username, password } }
-    );
-    if (VT.data.content.errors) {
-      return res.status(400).json({ errors: VT?.data?.content?.errors, status: false, error: true, message: 'Error' })
-    }
-    let content = VT?.data?.content?.transactions
-    const db_data = await UTILITIES.create({
-      phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type, source, merchant_id
-    })
+    const res = await axios.post('https://api.flutterwave.com/v3/bills', { country: 'NG', customer, amount, type, reference: 'ONCE' }, { headers: { Authorization: `Bearer ${process.env.flutterwave_sec_key}` } });
 
-    res.status(200).json({ data: VT.data, db_data, status: true });
+    console.log(res.data);
+
+    res.status(200).json({data: res.data, message: 'Success'})
+
+    // const db_data = await UTILITIES.create({
+    //   phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type, source, merchant_id
+    // })
+
+    // res.status(200).json({ data: VT.data, db_data, status: true });
   } catch (error) {
-    console.log({ error });
-    res.status(500).json({ error });
+    console.log(error?.response?.data);
+    res.status(500).json({ error: true, message: error?.response?.data });
   }
 };
 
