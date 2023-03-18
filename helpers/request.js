@@ -46,12 +46,13 @@ const teamLeadCount = async (agent_phone, filter) => {
 }
 
 const getMerchantTransactions = async (merchant_id, period) => {
+    console.log(merchant_id, period);
     try {
         const body = await axios.post(`https://wema.creditclan.com/api/v3/summary/transsummary/`, { merchant_id, period })
 
         return body?.data?.data
     } catch (error) {
-        console.log(error?.response?.body ?? error);
+        console.log(error?.response?.data ?? error);
         return false;
     }
 }
