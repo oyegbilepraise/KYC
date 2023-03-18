@@ -39,16 +39,20 @@ const kyc = async (req, res) => {
       step = 0;
       step++;
       const user = await request.getStaffDetails(phone);
+      if(user) {
+        let messages = `Welcome *${user.data.full_name}* \n\n Please select from options below`;
+        message = await interactive.List(messages, [
+          { id: "1", title: "My Lead" },
+          { id: "2", title: "Transactions Today" },
+          { id: "3", title: "My Teams Today" },
+          { id: "4", title: "Claim Merchant" },
+          { id: "5", title: "Report Card" },
+        ]);
+        await KYC.update({ step, location: user?.data?.id }, { where: { id: starting.id } });
+      } else {
+        message = 'You are not allowed to use this service '
+      }
       console.log({ user });
-      let messages = `Welcome *${user.data.full_name}* \n\n Please select from options below`;
-      message = await interactive.List(messages, [
-        { id: "1", title: "My Lead" },
-        { id: "2", title: "Transactions Today" },
-        { id: "3", title: "My Teams Today" },
-        { id: "4", title: "Claim Merchant" },
-        { id: "5", title: "Report Card" },
-      ]);
-      await KYC.update({ step, location: user?.data?.id }, { where: { id: starting.id } });
     } else if (step === 1 && stage === 0) {
       if (response === '1') {
         let { data } = await request.getStaffDetails(phone);
