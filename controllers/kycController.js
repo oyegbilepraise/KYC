@@ -29,6 +29,7 @@ const kyc = async (req, res) => {
       step = 0;
       step++;
       const user = await request.getStaffDetails(phone);
+      console.log({ user });
       let messages = `Welcome ${user.data.full_name} Please select from below options`;
       message = await interactive.List(messages, [
         { id: "1", title: "My Lead" },
@@ -37,7 +38,7 @@ const kyc = async (req, res) => {
         { id: "4", title: "Claim Merchant" },
         { id: "5", title: "Report Card" },
       ]);
-      await KYC.update({ step, location: user?.id }, { where: { id: starting.id } });
+      await KYC.update({ step, location: user?.data?.id }, { where: { id: starting.id } });
     } else if (step === 1 && stage === 0) {
       if (response === '1') {
         let { data } = await request.getStaffDetails(phone);
@@ -113,7 +114,7 @@ const kyc = async (req, res) => {
       if (response === '1') {
         const data = await request.merchantCount(phone, 'month');
         const merchant = await request.getMerchantTransactions(data.merchant_ids, 1);
-        const url = `https://cc-payments.netlify.app/report/bm/${starting.location}/month`;
+        const url = `https://cc-payments.netlify.app/report/${starting.location}/month`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
         let count = (+merchant.inflows || 0) + (+merchant.outflows || 0);
         message = `Inflow Count: ${merchant.inflows || 0}, \n Outflow Count: ${merchant.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count || 0}, \n Transaction Count: ${count || 0}   \n\n Click on the link below to check details \n\n ${body?.data?.url}`
