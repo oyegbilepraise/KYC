@@ -31,7 +31,6 @@ const kyc = async (req, res) => {
       step = 0;
       step++;
       const user = await request.getStaffDetails(phone);
-      console.log({ user });
       let messages = `Welcome ${user.data.full_name} Please select from below options`;
       message = await interactive.List(messages, [
         { id: "1", title: "My Lead" },
