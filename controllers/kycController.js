@@ -94,19 +94,24 @@ const kyc = async (req, res) => {
         await KYC.update({ step, stage }, { where: { id: starting.id } });
       }
     } else if (step === 2 && stage === 0) {
-      let { data } = await request.getStaffDetails(response);
-      let messages =
-        `The Team lead name is ${data.full_name}`;
-      message = await interactive.productsButtons(
-        messages,
-        [
-          { id: "2", title: "No! Cancel" },
-          { id: "1", title: "Yes! Continue" },
-        ],
-        req?.body?.provider
-      );
-      step++;
-      await KYC.update({ step, other_name: data.mobile }, { where: { id: starting.id } });
+      let  data  = await request.getStaffDetails(response);
+      console.log({data});
+      if (data.status) {
+        let messages =
+          `The Team lead name is ${data?.data?.full_name}`;
+        message = await interactive.productsButtons(
+          messages,
+          [
+            { id: "2", title: "No! Cancel" },
+            { id: "1", title: "Yes! Continue" },
+          ],
+          req?.body?.provider
+        );
+        step++;
+        await KYC.update({ step, other_name: data.mobile }, { where: { id: starting.id } });
+      } else {
+        message = 'This number does not belong to any team lead, please try again'
+      }
     } else if (step === 3 && stage === 0) {
       if (response === '1') {
         await request.attachAgentToLead(starting.other_name, phone);
