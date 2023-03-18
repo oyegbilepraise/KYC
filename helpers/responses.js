@@ -728,13 +728,13 @@ class Responses {
           type: "list",
           header: {
             type: "text",
-            text: ".",
+            text: "",
           },
           body: {
             text: title,
           },
           action: {
-            button: "select menu👇",
+            button: "menu",
             sections: [
               {
                 title: "Select an option",
