@@ -728,7 +728,7 @@ class Responses {
           type: "list",
           header: {
             type: "text",
-            text: "",
+            text: ".",
           },
           body: {
             text: title,
