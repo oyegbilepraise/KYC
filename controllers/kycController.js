@@ -34,7 +34,7 @@ const kyc = async (req, res) => {
       let messages = `Welcome ${user.data.full_name} Please select from below options`;
       message = await interactive.List(messages, [
         { id: "1", title: "My Lead" },
-        { id: "2", title: "My Transactions Today" },
+        { id: "2", title: "Transactions Today" },
         { id: "3", title: "My Teams Today" },
         { id: "4", title: "Claim Merchant" },
         { id: "5", title: "Report Card" },
