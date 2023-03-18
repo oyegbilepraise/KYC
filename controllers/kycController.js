@@ -11,6 +11,8 @@ let stage = 0;
 const kyc = async (req, res) => {
   let { phone, response } = req.body;
 
+
+
   phone = "0" + phone.substr(-10);
 
   let [starting, created] = await KYC.findOrCreate({
@@ -23,6 +25,12 @@ const kyc = async (req, res) => {
     stage = starting.stage;
   }
 
+  if (response.trim().toLowerCase() === 'field') {
+    stage = 0;
+    step = 0;
+    await KYC.update({ step, stage }, { where: { id: starting.id } });
+  }
+
   let message;
 
   try {
@@ -32,7 +40,7 @@ const kyc = async (req, res) => {
       step++;
       const user = await request.getStaffDetails(phone);
       console.log({ user });
-      let messages = `Welcome ${user.data.full_name} Please select from below options`;
+      let messages = `Welcome *${user.data.full_name}* \n\n Please select from options below`;
       message = await interactive.List(messages, [
         { id: "1", title: "My Lead" },
         { id: "2", title: "Transactions Today" },
