@@ -11,6 +11,8 @@ let stage = 0;
 const kyc = async (req, res) => {
   let { phone, response } = req.body;
 
+  phone = "0" + phone.substr(-10);
+
   let [starting, created] = await KYC.findOrCreate({
     where: { phone: "0" + phone.substr(-10) },
     defaults: { phone: "0" + phone.substr(-10) },
