@@ -11,7 +11,6 @@ const getStaffDetails = async (phone) => {
 }
 
 const attachAgentToLead = async (lead_phone, agent_phone) => {
-    console.log({ lead_phone, agent_phone });
     try {
         const body = await axios.post(`https://sellbackend.creditclan.com/merchantclan/public/index.php/api/agent/lead`, { lead_phone, agent_phone });
         console.log(body.data);
@@ -49,6 +48,8 @@ const getMerchantTransactions = async (merchant_id, period) => {
     console.log(merchant_id, period);
     try {
         const body = await axios.post(`https://wema.creditclan.com/api/v3/summary/transsummary/`, { merchant_id, period })
+
+        console.log(body.data);
 
         return body?.data?.data
     } catch (error) {

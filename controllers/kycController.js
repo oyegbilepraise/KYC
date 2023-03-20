@@ -161,7 +161,8 @@ const kyc = async (req, res) => {
     } else if (step === 1 && stage === 4) {
       if (response === '1') {
         const data = await request.merchantCount(phone, 'month');
-        const merchant = await request.getMerchantTransactions(data.merchant_ids, 1);
+        const merchant = await request.getMerchantTransactions(data.merchant_ids, 2);
+        console.log({ merchant });
         const url = `https://cc-payments.netlify.app/report/${starting.location}/month`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
         let count = (+merchant.inflows || 0) + (+merchant.outflows || 0);
