@@ -8,8 +8,19 @@ const KYC = db.kyc;
 let step = 0;
 let stage = 0;
 
+const callClaimMerchant = async (response, phone, provider, channelId) => {
+  try {
+    const res = await axios.post('https://wasapnodeserver.herokuapp.com/claim_merchant', { response, phoneNumber: phone, provider, channelId });
+
+    return res.data ?? null;
+  } catch (error) {
+    console.log(error);
+    console.log(error?.response?.data);
+  }
+}
+
 const kyc = async (req, res) => {
-  let { phone, response } = req.body;
+  let { phone, response, provider, channelId } = req.body;
   let message;
   phone = "0" + phone.substr(-10);
 
@@ -81,8 +92,10 @@ const kyc = async (req, res) => {
         step = 0, stage = 0;
         await KYC.update({ step, stage }, { where: { id: starting.id } });
       } else if (response === '4') {
-        message = 'Claim Merchant'
+        const claim = await callClaimMerchant('claim', phone, provider, channelId)
+        message = claim.message
         step = 1, stage = 3;
+        await KYC.update({ step, stage }, { where: { id: starting.id } });
       } else if (response === '5') {
         let messages =
           `Please choose an option`;
@@ -99,7 +112,6 @@ const kyc = async (req, res) => {
       }
     } else if (step === 2 && stage === 0) {
       let data = await request.getStaffDetails(response);
-      console.log({ data });
       if (data.status) {
         if (phone === data?.data?.mobile) {
           let messages = 'You can not add yourself as team lead. Please enter your team lead\'s number'
@@ -150,15 +162,14 @@ const kyc = async (req, res) => {
         await KYC.update({ step, stage }, { where: { id: starting.id } });
       } else if (response === '2') {
         const data = await request.teamLeadCount(phone, 'month');
-        console.log({ data });
         const merchant = await request.getMerchantTransactions(data.merchant_ids, 2);
         const url = `https://cc-payments.netlify.app/report/bm/${starting.location}/month`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
-        let messages = `Inflow Amount: ${merchant.inflows || 0}, \n Outflow Amount: ${merchant.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count || 0}, \n Team Members: ${data.team_members.length || 0} \n\n Click on the link below to check details \n\n ${body?.data?.url}`;
-        message = await interactive.List(messages, list);
+        let messages = `Inflow Amount: ${merchant?.inflows || 0}, \n Outflow Amount: ${merchant?.outflows || 0}, \n Merchant Count: ${data?.onboarded_merchants_count || 0}, \n Team Members: ${data?.team_members?.length || 0} \n\n Click on the link below to check details \n\n ${body?.data?.url}`;
         stage = 0;
         step = 0;
         await KYC.update({ step, stage }, { where: { id: starting.id } });
+        message = await interactive.List(messages, list);
       }
     }
     return res.status(200).json({ message });
