@@ -54,7 +54,14 @@ const kyc = async (req, res) => {
       if (response === '1') {
         let { data } = await request.getStaffDetails(phone);
         if (data.lead !== null) {
-          message = `You are already attached to a Team Lead \n\n Thank you!`
+          let messages = `You are already attached to a Team Lead \n\n Thank you!`
+          message = await interactive.List(messages, [
+            { id: "1", title: "My Lead" },
+            { id: "2", title: "Transactions Today" },
+            { id: "3", title: "My Teams Today" },
+            { id: "4", title: "Claim Merchant" },
+            { id: "5", title: "Report Card" },
+          ]);
           step = 0, stage = 0;
         } else {
           message = 'Please enter team lead number';
