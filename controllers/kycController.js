@@ -10,8 +10,16 @@ let stage = 0;
 
 const kyc = async (req, res) => {
   let { phone, response } = req.body;
-
+  let message;
   phone = "0" + phone.substr(-10);
+
+  let list = [
+    { id: "1", title: "My Lead" },
+    { id: "2", title: "Transactions Today" },
+    { id: "3", title: "My Teams Today" },
+    { id: "4", title: "Claim Merchant" },
+    { id: "5", title: "Report Card" },
+  ]
 
   let [starting, created] = await KYC.findOrCreate({
     where: { phone: "0" + phone.substr(-10) },
@@ -29,7 +37,6 @@ const kyc = async (req, res) => {
     await KYC.update({ step, stage }, { where: { id: starting.id } });
   }
 
-  let message;
 
   try {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "field") {
@@ -39,29 +46,18 @@ const kyc = async (req, res) => {
       const user = await request.getStaffDetails(phone);
       if (user) {
         let messages = `Welcome *${user.data.full_name}* \n\n Please select from options below`;
-        message = await interactive.List(messages, [
-          { id: "1", title: "My Lead" },
-          { id: "2", title: "Transactions Today" },
-          { id: "3", title: "My Teams Today" },
-          { id: "4", title: "Claim Merchant" },
-          { id: "5", title: "Report Card" },
-        ]);
+        message = await interactive.List(messages, list);
         await KYC.update({ step, location: user?.data?.id }, { where: { id: starting.id } });
       } else {
-        message = 'You are not allowed to use this service '
+        let messages = 'You are not allowed to use this service '
+        message = await interactive.List(messages, list);
       }
     } else if (step === 1 && stage === 0) {
       if (response === '1') {
         let { data } = await request.getStaffDetails(phone);
         if (data.lead !== null) {
           let messages = `You are already attached to a Team Lead \n\n Thank you!`
-          message = await interactive.List(messages, [
-            { id: "1", title: "My Lead" },
-            { id: "2", title: "Transactions Today" },
-            { id: "3", title: "My Teams Today" },
-            { id: "4", title: "Claim Merchant" },
-            { id: "5", title: "Report Card" },
-          ]);
+          message = await interactive.List(messages, list);
           step = 0, stage = 0;
         } else {
           message = 'Please enter team lead number';
@@ -107,13 +103,7 @@ const kyc = async (req, res) => {
       if (data.status) {
         if (phone === data?.data?.mobile) {
           let messages = 'You can not add yourself as team lead. Please enter your team lead\'s number'
-          message = await interactive.List(messages, [
-            { id: "1", title: "My Lead" },
-            { id: "2", title: "Transactions Today" },
-            { id: "3", title: "My Teams Today" },
-            { id: "4", title: "Claim Merchant" },
-            { id: "5", title: "Report Card" },
-          ]);
+          message = await interactive.List(messages, list);
         } else {
           let messages =
             `The Team lead name is ${data?.data?.full_name}`;
@@ -130,25 +120,13 @@ const kyc = async (req, res) => {
         }
       } else {
         let messages = 'This number does not belong to any team lead, please try again'
-        message = await interactive.List(messages, [
-          { id: "1", title: "My Lead" },
-          { id: "2", title: "Transactions Today" },
-          { id: "3", title: "My Teams Today" },
-          { id: "4", title: "Claim Merchant" },
-          { id: "5", title: "Report Card" },
-        ]);
+        message = await interactive.List(messages, list);
       }
     } else if (step === 3 && stage === 0) {
       if (response === '1') {
         await request.attachAgentToLead(starting.other_name, phone);
         let messages = 'You have successfully been attached to this team lead.';
-        message = await interactive.List(messages, [
-          { id: "1", title: "My Lead" },
-          { id: "2", title: "Transactions Today" },
-          { id: "3", title: "My Teams Today" },
-          { id: "4", title: "Claim Merchant" },
-          { id: "5", title: "Report Card" },
-        ]);
+        message = await interactive.List(messages, list);
         stage = 0;
         step = 0;
         await KYC.update({ step, stage }, { where: { id: starting.id } });
