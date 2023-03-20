@@ -10,7 +10,7 @@ let stage = 0;
 
 const callClaimMerchant = async (response, phone, provider, channelId) => {
   try {
-    const res = await axios.post('https://wasapnodeserver.herokuapp.com/claim_merchant', { response, phoneNumber: phone, provider, channelId });
+    const res = await axios.post('https://wasapnodeserver.herokuapp.com/claim_merchant', { response, phoneNumber: phone, provider, channelId, source: 'field' });
 
     return res.data ?? null;
   } catch (error) {
