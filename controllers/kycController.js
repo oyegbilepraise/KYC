@@ -43,22 +43,18 @@ const kyc = async (req, res) => {
   }
 
   if (response.trim().toLowerCase() === 'field') {
-    stage = 0;
-    step = 0;
-    await KYC.update({ step, stage }, { where: { id: starting.id } });
+    await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
   }
 
 
   try {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "field") {
-      stage = 0;
-      step = 0;
       step++;
       const user = await request.getStaffDetails(phone);
       if (user) {
         let messages = `Welcome *${user.data.full_name}* \n\n Please select from options below`;
         message = await interactive.List(messages, list);
-        await KYC.update({ step, location: user?.data?.id }, { where: { id: starting.id } });
+        await KYC.update({ step: 0, location: user?.data?.id }, { where: { id: starting.id } });
       } else {
         let messages = 'You are not allowed to use this service '
         message = await interactive.List(messages, list);
@@ -80,22 +76,19 @@ const kyc = async (req, res) => {
         const merchant = await request.getMerchantTransactions(data.merchant_ids, 1)
         const url = `https://cc-payments.netlify.app/report/${starting.location}/today`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
-        step = 0, stage = 0;
         let count = (+merchant.inflows || 0) + (+merchant.outflow || 0);
         message = `Inflow Count: ${merchant.inflows || 0}, \n Outflow Count: ${merchant.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count || 0}, \n Transaction Count: ${count || 0}. \n\n Click on the link below to check details \n\n ${body?.data?.url}`
-        await KYC.update({ step, stage }, { where: { id: starting.id } });
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
       } else if (response === '3') {
         const data = await request.teamLeadCount(phone, 'today');
         const url = `https://cc-payments.netlify.app/report/bm/${starting.location}/today`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
         message = `Inflow Amount: ${data.inflows || 0}, \n Outflow Amount: ${data.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count}, \n Team Members: ${data.team_members.length || 0} \n\n Click on the link below for details \n\n ${body?.data?.url}`;
-        step = 0, stage = 0;
-        await KYC.update({ step, stage }, { where: { id: starting.id } });
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
       } else if (response === '4') {
         const claim = await callClaimMerchant('claim', phone, provider, channelId)
         message = claim.message
-        step = 1, stage = 3;
-        await KYC.update({ step, stage }, { where: { id: starting.id } });
+        await KYC.update({ step: 1, stage: 3 }, { where: { id: starting.id } });
       } else if (response === '5') {
         let messages =
           `Please choose an option`;
@@ -107,8 +100,7 @@ const kyc = async (req, res) => {
           ],
           req?.body?.provider
         );
-        step = 1, stage = 4;
-        await KYC.update({ step, stage }, { where: { id: starting.id } });
+        await KYC.update({ step: 1, stage: 4 }, { where: { id: starting.id } });
       }
     } else if (step === 2 && stage === 0) {
       let data = await request.getStaffDetails(response);
@@ -139,14 +131,11 @@ const kyc = async (req, res) => {
         await request.attachAgentToLead(starting.other_name, phone);
         let messages = 'You have successfully been attached to this team lead.';
         message = await interactive.List(messages, list);
-        stage = 0;
-        step = 0;
-        await KYC.update({ step, stage }, { where: { id: starting.id } });
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
       }
       else if (response === '2') {
         message = 'Please enter team lead number';
-        step = 2;
-        await KYC.update({ step }, { where: { id: starting.id } });
+        await KYC.update({ step: 2 }, { where: { id: starting.id } });
       }
     } else if (step === 1 && stage === 4) {
       if (response === '1') {
@@ -157,26 +146,28 @@ const kyc = async (req, res) => {
         let count = (+merchant.inflows || 0) + (+merchant.outflows || 0);
         let messages = `Inflow Count: ${merchant.inflows || 0}, \n Outflow Count: ${merchant.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count || 0}, \n Transaction Count: ${count || 0}   \n\n Click on the link below to check details \n\n ${body?.data?.url}`
         message = await interactive.List(messages, list);
-        stage = 0;
-        step = 0;
-        await KYC.update({ step, stage }, { where: { id: starting.id } });
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
       } else if (response === '2') {
         const data = await request.teamLeadCount(phone, 'month');
         const merchant = await request.getMerchantTransactions(data.merchant_ids, 2);
         const url = `https://cc-payments.netlify.app/report/bm/${starting.location}/month`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
         let messages = `Inflow Amount: ${merchant?.inflows || 0}, \n Outflow Amount: ${merchant?.outflows || 0}, \n Merchant Count: ${data?.onboarded_merchants_count || 0}, \n Team Members: ${data?.team_members?.length || 0} \n\n Click on the link below to check details \n\n ${body?.data?.url}`;
-        stage = 0;
-        step = 0;
-        await KYC.update({ step, stage }, { where: { id: starting.id } });
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
         message = await interactive.List(messages, list);
       }
+    } else if (step === 1 & stage === 3) {
+      const claim = await callClaimMerchant(response, phone, provider, channelId);
+
+      let messages = claim.message;
+      await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
+      message = await interactive.List(messages, list);
     }
     return res.status(200).json({ message });
   } catch (error) {
     console.log(error);
     console.log(error.response?.data);
-    res.status(500).json({ error: error?.response?.data })
+    res.status(500).json({ error: error?.response?.data });
   }
 };
 
