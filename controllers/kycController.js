@@ -147,9 +147,11 @@ const kyc = async (req, res) => {
         message = `Inflow Count: ${merchant.inflows || 0}, \n Outflow Count: ${merchant.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count || 0}, \n Transaction Count: ${count || 0}   \n\n Click on the link below to check details \n\n ${body?.data?.url}`
       } else if (response === '2') {
         const data = await request.teamLeadCount(phone, 'month');
+        const merchant = await request.getMerchantTransactions(data.merchant_ids, 2);
+        console.log(merchant);
         const url = `https://cc-payments.netlify.app/report/bm/${starting.location}/month`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
-        message = `Inflow Amount: ${data.inflows || 0}, \n Outflow Amount: ${data.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count || 0}, \n Team Members: ${data.team_members.length || 0} \n\n Please click on the link below for details ---  \n\n Click on the link below to check details \n\n ${body?.data?.url}`;
+        message = `Inflow Amount: ${merchant.inflows || 0}, \n Outflow Amount: ${merchant.outflows || 0}, \n Merchant Count: ${merchant.onboarded_merchants_count || 0}, \n Team Members: ${data.team_members.length || 0} \n\n Please click on the link below for details ---  \n\n Click on the link below to check details \n\n ${body?.data?.url}`;
       }
     }
     return res.status(200).json({ message });
