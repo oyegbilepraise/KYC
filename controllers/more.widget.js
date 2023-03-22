@@ -150,11 +150,11 @@ const verify_smartcard_number = async (req, res) => {
 const renew_catbletv_sub = async (req, res) => {
   const { customer, amount, type } = req.body;
   try {
-    const res = await axios.post('https://api.flutterwave.com/v3/bills', { country: 'NG', customer, amount, type, reference: 'ONCE' }, { headers: { Authorization: `Bearer ${process.env.flutterwave_sec_key}` } });
+    const res = await axios.post('https://mobile.creditclan.com/api/v3/bills/payment', { country, customer, amount, type, reference: 'ONCE' });
 
     console.log(res.data);
 
-    res.status(200).json({data: res.data, message: 'Success'})
+    res.status(200).json({ data: res.data, message: 'Success' });
 
     // const db_data = await UTILITIES.create({
     //   phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type, source, merchant_id
