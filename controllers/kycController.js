@@ -54,7 +54,7 @@ const kyc = async (req, res) => {
       if (user) {
         let messages = `Welcome *${user.data.full_name}* \n\n Please select from options below`;
         message = await interactive.List(messages, list);
-        await KYC.update({ step: 0, location: user?.data?.id }, { where: { id: starting.id } });
+        await KYC.update({ step: 1, stage: 0, location: user?.data?.id }, { where: { id: starting.id } });
       } else {
         let messages = 'You are not allowed to use this service '
         message = await interactive.List(messages, list);

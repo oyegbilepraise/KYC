@@ -148,20 +148,21 @@ const verify_smartcard_number = async (req, res) => {
 };
 
 const renew_catbletv_sub = async (req, res) => {
-  const { customer, amount, type } = req.body;
+  const { customer, amount, type, country, merchant_id, source, phone } = req.body;
   try {
-    const res = await axios.post('https://mobile.creditclan.com/api/v3/bills/payment', { country, customer, amount, type, reference: 'ONCE' });
+    const resi = await axios.post('https://mobile.creditclan.com/api/v3/bills/payment', { country, customer, amount, type, reference: 'ONCE' }, { headers: { 'x-api-key': 'WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228' } });
 
-    console.log(res.data);
+    console.log(resi.data);
 
-    res.status(200).json({ data: res.data, message: 'Success' });
+    res.status(200).json({ data: resi.data, message: 'Success' });
 
-    // const db_data = await UTILITIES.create({
-    //   phone, amount, status: content?.status, response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type, source, merchant_id
-    // })
+    await UTILITIES.create({
+      phone, amount, status: resi?.status, product_name: resi?.data?.network, transactionId: resi?.data?.reference, flw_ref: resi?.data?.flw_ref, source, merchant_id
+    })
 
     // res.status(200).json({ data: VT.data, db_data, status: true });
   } catch (error) {
+    console.log(error);
     console.log(error?.response?.data);
     res.status(500).json({ error: true, message: error?.response?.data });
   }
