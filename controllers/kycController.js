@@ -25,11 +25,11 @@ const kyc = async (req, res) => {
   phone = "0" + phone.substr(-10);
 
   let list = [
-    { id: "1", title: "My Lead" },
-    { id: "2", title: "Transactions Today" },
-    { id: "3", title: "My Teams Today" },
-    { id: "4", title: "Claim Merchant" },
-    { id: "5", title: "Report Card" },
+    { id: "lead", title: "My Lead" },
+    { id: "mtt-se", title: "Transactions Today" },
+    { id: "mtt-bm", title: "My Teams Today" },
+    { id: "claim", title: "Claim Merchant" },
+    { id: "report", title: "Report Card" },
   ]
 
   let [starting, created] = await KYC.findOrCreate({
@@ -46,6 +46,10 @@ const kyc = async (req, res) => {
     await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
   }
 
+  if (response.trim().toLowerCase() === 'lead' || response.trim().toLowerCase() === 'mtt-se' || response.trim().toLowerCase() === 'mtt-bm' || response.trim().toLowerCase() === 'claim' || response.trim().toLowerCase() === 'report') {
+    step = 1, stage = 0;
+    await KYC.update({ step, stage }, { where: { id: starting.id } });
+  }
 
   try {
     if (step == 0 && stage == 0 && response.trim().toLowerCase() == "field") {
@@ -60,7 +64,7 @@ const kyc = async (req, res) => {
         message = await interactive.List(messages, list);
       }
     } else if (step === 1 && stage === 0) {
-      if (response === '1') {
+      if (response === 'lead') {
         let { data } = await request.getStaffDetails(phone);
         if (data.lead !== null) {
           let messages = `You are already attached to a Team Lead \n\n Thank you!`
@@ -71,7 +75,7 @@ const kyc = async (req, res) => {
           step++;
         }
         await KYC.update({ step, stage }, { where: { id: starting.id } });
-      } else if (response === '2') {
+      } else if (response === 'mtt-se') {
         const data = await request.merchantCount(phone, 'today');
         const merchant = await request.getMerchantTransactions(data.merchant_ids, 1)
         const url = `https://cc-payments.netlify.app/report/${starting.location}/today`;
@@ -79,17 +83,17 @@ const kyc = async (req, res) => {
         let count = (+merchant.inflows || 0) + (+merchant.outflow || 0);
         message = `Inflow Count: ${merchant.inflows || 0}, \n Outflow Count: ${merchant.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count || 0}, \n Transaction Count: ${count || 0}. \n\n Click on the link below to check details \n\n ${body?.data?.url}`
         await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
-      } else if (response === '3') {
+      } else if (response === 'mtt-bm') {
         const data = await request.teamLeadCount(phone, 'today');
         const url = `https://cc-payments.netlify.app/report/bm/${starting.location}/today`;
         const body = await axios.get(`https://cclan.cc/?url=${url}&format=json`);
         message = `Inflow Amount: ${data.inflows || 0}, \n Outflow Amount: ${data.outflows || 0}, \n Merchant Count: ${data.onboarded_merchants_count}, \n Team Members: ${data.team_members.length || 0} \n\n Click on the link below for details \n\n ${body?.data?.url}`;
         await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
-      } else if (response === '4') {
+      } else if (response === 'claim') {
         const claim = await callClaimMerchant('claim', phone, provider, channelId)
         message = claim.message
         await KYC.update({ step: 1, stage: 3 }, { where: { id: starting.id } });
-      } else if (response === '5') {
+      } else if (response === 'report') {
         let messages =
           `Please choose an option`;
         message = await interactive.productsButtons(
