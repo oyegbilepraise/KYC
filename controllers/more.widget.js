@@ -152,14 +152,12 @@ const renew_catbletv_sub = async (req, res) => {
   try {
     const resi = await axios.post('https://mobile.creditclan.com/api/v3/bills/payment', { country, customer, amount, type, reference: 'ONCE' }, { headers: { 'x-api-key': 'WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228' } });
 
-    console.log(resi.data);
-
-    res.status(200).json({ data: resi.data, message: 'Success' });
 
     await UTILITIES.create({
       phone, amount, status: resi?.status, product_name: resi?.data?.network, transactionId: resi?.data?.reference, flw_ref: resi?.data?.flw_ref, source, merchant_id
     })
 
+    res.status(200).json({ data: resi.data, message: 'Success' });
     // res.status(200).json({ data: VT.data, db_data, status: true });
   } catch (error) {
     console.log(error);
