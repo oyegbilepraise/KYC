@@ -5,6 +5,7 @@ const password = process.env.VT_PASSWORD;
 const db = require("../models");
 const axios = require("axios");
 const UTILITIES = db.utilities;
+const shortid = require("shortid");
 
 const Flutterwave = require("flutterwave-node-v3");
 const flw = new Flutterwave(process.env.flutterwave_public_key, process.env.flutterwave_sec_key);
@@ -149,8 +150,9 @@ const verify_smartcard_number = async (req, res) => {
 
 const renew_catbletv_sub = async (req, res) => {
   const { customer, amount, type, country, merchant_id, source, phone } = req.body;
+  const trackingReference = "cc-" + shortid.generate();
   try {
-    const resi = await axios.post('https://mobile.creditclan.com/api/v3/bills/payment', { country, customer, amount, type, reference: 'ONCE' }, { headers: { 'x-api-key': 'WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228' } });
+    const resi = await axios.post('https://mobile.creditclan.com/api/v3/bills/payment', { country, customer, amount, type, reference: trackingReference }, { headers: { 'x-api-key': 'WE4mwadGYqf0jv1ZkdFv1LNPMpZHuuzoDDiJpQQqaes3PzB7xlYhe8oHbxm6J228' } });
 
     await UTILITIES.create({
       phone, amount, status: resi?.status, product_name: resi?.data?.network, transactionId: resi?.data?.reference, flw_ref: resi?.data?.flw_ref, source, merchant_id
