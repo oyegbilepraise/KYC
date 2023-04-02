@@ -21,9 +21,11 @@ const callClaimMerchant = async (response, phone, provider, channelId) => {
 
 const kyc = async (req, res) => {
   let { phone, response, provider, channelId } = req.body;
-  let message; 
+  let message;
 
-  let trimmed_res = response.trim().toLowerCase()
+  let trimmed_res = response.trim().toLowerCase();
+
+  console.log({ trimmed_res });
 
   phone = "0" + phone.substr(-10);
 
@@ -45,9 +47,15 @@ const kyc = async (req, res) => {
     stage = starting.stage;
   }
 
+  console.log({ step, stage });
+
   if (trimmed_res === 'field') {
+    step = 0, stage = 0;
     await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
   }
+
+  console.log({ step, stage });
+
 
   if (trimmed_res === 'lead' || trimmed_res === 'mtt-se' || trimmed_res === 'mtt-bm' || trimmed_res === 'claim' || trimmed_res === 'report') {
     step = 1, stage = 0;
@@ -56,7 +64,6 @@ const kyc = async (req, res) => {
 
   try {
     if (step == 0 && stage == 0 && trimmed_res == "field") {
-      step++;
       const user = await request.getStaffDetails(phone);
       if (user) {
         let messages = `Welcome *${user.data.full_name}* \n\nPlease select from options below`;
