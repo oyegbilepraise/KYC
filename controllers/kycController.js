@@ -29,7 +29,7 @@ const kyc = async (req, res) => {
     { id: "mtt-se", title: "Transactions Today" },
     { id: "mtt-bm", title: "My Teams Today" },
     { id: "claim", title: "Claim Merchant" },
-    { id: "report", title: "Report Card" },
+    { id: "report-card", title: "Report Card" },
   ]
 
   let [starting, created] = await KYC.findOrCreate({
@@ -47,7 +47,7 @@ const kyc = async (req, res) => {
     await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
   }
 
-  if (trimmed_res === 'lead' || trimmed_res === 'mtt-se' || trimmed_res === 'mtt-bm' || trimmed_res === 'claim' || trimmed_res === 'report') {
+  if (trimmed_res === 'lead' || trimmed_res === 'mtt-se' || trimmed_res === 'mtt-bm' || trimmed_res === 'claim' || trimmed_res === 'report-card') {
     step = 1, stage = 0;
     await KYC.update({ step, stage }, { where: { id: starting.id } });
   }
@@ -93,7 +93,7 @@ const kyc = async (req, res) => {
         const claim = await callClaimMerchant('claim', phone, provider, channelId)
         message = claim.message
         await KYC.update({ step: 1, stage: 3 }, { where: { id: starting.id } });
-      } else if (response === 'report') {
+      } else if (response === 'report-card') {
         let messages =
           `Please choose an option`;
         message = await interactive.productsButtons(
