@@ -71,7 +71,7 @@ const kyc = async (req, res) => {
     await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
   }
 
-  if (trimmed_res === 'lead' || trimmed_res === 'mtt-se' || trimmed_res === 'mtt-bm' || trimmed_res === 'claim' || trimmed_res === 'report-card') {
+  if (trimmed_res === 'lead' || trimmed_res === 'mtt-se' || trimmed_res === 'mtt-bm' || trimmed_res === 'claim' || trimmed_res === 'report-card' || trimmed_res === 'b-k' || trimmed_res === 'o-m') {
     step = 1, stage = 0;
     await KYC.update({ step, stage }, { where: { id: starting.id } });
   }
@@ -199,7 +199,8 @@ const kyc = async (req, res) => {
       message = await interactive.List(messages, list);
     } else if (step === 1 && stage === 5) {
       const claim = await callBookCredit(response, phone, provider, channelId);
-      if (claim.status) {
+      console.log({ claim });
+      if (claim.completed) {
         let messages = claim.message;
         await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
         message = await interactive.List(messages, list);
@@ -208,7 +209,8 @@ const kyc = async (req, res) => {
       }
     } else if (step === 1 && stage === 6) {
       const claim = await callOnboardMerchant(response, phone, provider, channelId);
-      if (claim.status) {
+      console.log({ claim });
+      if (claim.completed) {
         let messages = claim.message;
         await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
         message = await interactive.List(messages, list);
