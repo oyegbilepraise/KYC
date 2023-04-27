@@ -109,7 +109,7 @@ const data_subscripton = async (req, res) => {
     res.status(200).json({ data: VT.data, status: true, db_data });
   } catch (error) {
     console.log({ error });
-    res.status(500).json({ error, status: false });
+    res.status(500).json({ error: error?.response?.data, status: false });
   }
 };
 

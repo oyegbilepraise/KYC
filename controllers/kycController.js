@@ -19,6 +19,28 @@ const callClaimMerchant = async (response, phone, provider, channelId) => {
   }
 }
 
+const callBookCredit = async (response, phone, provider, channelId) => {
+  try {
+    const res = await axios.post('https://wasapnodeserver.herokuapp.com/se_statement', { phoneNumber: phone, response, provider, channelId });
+
+    return res.data ?? null;
+  } catch (error) {
+    console.log(error);
+    console.log(error?.response?.data);
+  }
+}
+
+const callOnboardMerchant = async (response, phone, provider, channelId) => {
+  try {
+    const res = await axios.post('https://wasapnodeserver.herokuapp.com/onboard_merchant', { phoneNumber: phone, response, provider, channelId });
+
+    return res.data ?? null;
+  } catch (error) {
+    console.log(error);
+    console.log(error?.response?.data);
+  }
+}
+
 const kyc = async (req, res) => {
   let { phone, response, provider, channelId } = req.body;
   let message;
@@ -30,6 +52,8 @@ const kyc = async (req, res) => {
     { id: "mtt-bm", title: "My Teams Today" },
     { id: "claim", title: "Claim Merchant" },
     { id: "report-card", title: "Report Card" },
+    { id: 'b-k', title: 'Book Credit' },
+    { id: 'o-m', title: 'Onboard Merchant' }
   ]
 
   let [starting, created] = await KYC.findOrCreate({
@@ -105,6 +129,14 @@ const kyc = async (req, res) => {
           req?.body?.provider
         );
         await KYC.update({ step: 1, stage: 4 }, { where: { id: starting.id } });
+      } else if (response === 'b-k') {
+        const claim = await callBookCredit('statement', phone, provider, channelId);
+        message = claim.message;
+        await KYC.update({ step: 1, stage: 5 }, { where: { id: starting.id } });
+      } else if (response === 'o-m') {
+        const claim = await callOnboardMerchant('merchant', phone, provider, channelId);
+        message = claim.message;
+        await KYC.update({ step: 1, stage: 6 }, { where: { id: starting.id } });
       }
     } else if (step === 2 && stage === 0) {
       let data = await request.getStaffDetails(response);
@@ -162,10 +194,27 @@ const kyc = async (req, res) => {
       }
     } else if (step === 1 & stage === 3) {
       const claim = await callClaimMerchant(response, phone, provider, channelId);
-
       let messages = claim.message;
       await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
       message = await interactive.List(messages, list);
+    } else if (step === 1 && stage === 5) {
+      const claim = await callBookCredit(response, phone, provider, channelId);
+      if (claim.status) {
+        let messages = claim.message;
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
+        message = await interactive.List(messages, list);
+      } else {
+        message = claim.message;
+      }
+    } else if (step === 1 && stage === 6) {
+      const claim = await callOnboardMerchant(response, phone, provider, channelId);
+      if (claim.status) {
+        let messages = claim.message;
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
+        message = await interactive.List(messages, list);
+      } else {
+        message = claim.message;
+      }
     }
     return res.status(200).json({ message });
   } catch (error) {
