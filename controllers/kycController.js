@@ -43,6 +43,9 @@ const callOnboardMerchant = async (response, phone, provider, channelId) => {
 
 const kyc = async (req, res) => {
   let { phone, response, provider, channelId } = req.body;
+
+  console.log(response);
+  
   let message;
   let trimmed_res = response.trim().toLowerCase();
   phone = "0" + phone.substr(-10);
@@ -53,7 +56,8 @@ const kyc = async (req, res) => {
     { id: "claim", title: "Claim Merchant" },
     { id: "report-card", title: "Report Card" },
     { id: 'b-k', title: 'Book Credit' },
-    { id: 'o-m', title: 'Onboard Merchant' }
+    { id: 'o-m', title: 'Onboard Merchant' },
+    { id: 'r-l', title: 'Generate Referral Link' }
   ]
 
   let [starting, created] = await KYC.findOrCreate({
@@ -71,7 +75,7 @@ const kyc = async (req, res) => {
     await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
   }
 
-  if (trimmed_res === 'lead' || trimmed_res === 'mtt-se' || trimmed_res === 'mtt-bm' || trimmed_res === 'claim' || trimmed_res === 'report-card' || trimmed_res === 'b-k' || trimmed_res === 'o-m') {
+  if (trimmed_res === 'lead' || trimmed_res === 'mtt-se' || trimmed_res === 'mtt-bm' || trimmed_res === 'claim' || trimmed_res === 'report-card' || trimmed_res === 'b-k' || trimmed_res === 'o-m' || trimmed_res === 'r-l') {
     step = 1, stage = 0;
     await KYC.update({ step, stage }, { where: { id: starting.id } });
   }

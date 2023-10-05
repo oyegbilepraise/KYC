@@ -44,6 +44,8 @@ const airtime = async (req, res) => {
       },
       { auth: { username, password } }
     );
+    // console.log({ data: VT.data });
+    // return res.json(VT.data)
     if (VT.data.content.errors) {
       return res.status(400).json({ errors: VT?.data?.content?.errors, status: false, error: true, message: 'Error' })
     }
@@ -53,15 +55,16 @@ const airtime = async (req, res) => {
     })
     res.status(200).json({ data: VT.data.content, status: true, db_data });
 
-    // if (source === 'WhatsApp') {
-    // } else {
-    //   const db_data = await UTILITIES.create({
-    //     phone, amount, status: content?.status || 'N/A', response_description: VT?.data?.response_description, requestId: VT?.data?.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
-    //   })
-    //   res.status(200).json({ data: VT.data.content, status: true, db_data });
-    // }
+    if (source === 'WhatsApp') {
+    } else {
+      const db_data = await UTILITIES.create({
+        phone, amount, status: content?.status || 'N/A', response_description: VT?.data?.response_description, requestId: VT?.data?.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
+      })
+      res.status(200).json({ data: VT.data.content, status: true, db_data });
+    }
 
   } catch (error) {
+    console.log(error);
     console.log(error?.response?.data);
     res.status(500).json({ error: error?.response?.data, status: false });
   }
