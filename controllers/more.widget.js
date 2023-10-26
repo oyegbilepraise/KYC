@@ -260,7 +260,9 @@ const get_utilities = async (req, res) => {
 const getUtilsByPhone = async (req, res) => {
   const { phone } = req.body
   try {
-    const response = await UTILITIES.findAll({ where: { phone } });
+    const response = await UTILITIES.findAll({
+      where: { phone }, order: [['createdAt', 'DESC']]
+    });
     res.status(200).json({ data: response, error: false, message: 'Success', status: true });
   } catch (error) {
     console.log({ error });
