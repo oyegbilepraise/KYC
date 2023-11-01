@@ -1,3 +1,5 @@
+process.env.TZ = 'Etc/UTC';
+
 const express = require("express");
 const cors = require("cors");
 

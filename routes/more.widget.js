@@ -14,5 +14,6 @@ router.post("/query_status", moreController.query_status);
 router.get('/get_utilities', moreController.get_utilities);
 router.get('/get_flutterwave_bills_categories', moreController.get_flutterwave_bills_categories);
 router.post('/getUtilsByPhone', moreController.getUtilsByPhone);
+router.post('/getUtilsbyFilters', moreController.getUtilsbyFilters);
 
 module.exports = router;

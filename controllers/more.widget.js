@@ -6,7 +6,9 @@ const db = require("../models");
 const axios = require("axios");
 const UTILITIES = db.utilities;
 const shortid = require("shortid");
-
+const date_fns = require("date-fns");
+const { format, subSeconds, addSeconds } = require('date-fns')
+const { Op } = require("sequelize");
 const Flutterwave = require("flutterwave-node-v3");
 const flw = new Flutterwave(process.env.flutterwave_public_key, process.env.flutterwave_sec_key);
 
@@ -53,14 +55,14 @@ const airtime = async (req, res) => {
       }
       let content = VT?.data?.content?.transactions
       const db_data = await UTILITIES.create({
-        phone, amount, status: content?.status || 'N/A', response_description: VT?.data?.response_description, requestId: VT?.data?.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
+        phone, amount, status: content?.status || 'N/A', response_description: VT?.data?.response_description, requestId: VT?.data?.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id, transaction_ref: chargeWallet?.data?.transaction_id
       })
       res.status(200).json({ data: VT.data.content, status: true, db_data });
 
       if (source === 'WhatsApp') {
       } else {
         const db_data = await UTILITIES.create({
-          phone, amount, status: content?.status || 'N/A', response_description: VT?.data?.response_description, requestId: VT?.data?.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
+          phone, amount, status: content?.status || 'N/A', response_description: VT?.data?.response_description, requestId: VT?.data?.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id, transaction_ref: chargeWallet?.data?.transaction_id
         })
         res.status(200).json({ data: VT.data.content, status: true, db_data });
       }
@@ -103,7 +105,6 @@ const international = async (req, res) => {
 const data_subscripton = async (req, res) => {
   const { serviceID, amount, phone, billersCode, variation_code, source, merchant_id, narration, account_number } = req.body;
   try {
-
     const chargeWallet = await axios.post('https://wema.creditclan.com/withdraw/funds', { amount, merchant_id, account_number, narration });
     if (chargeWallet?.data?.status) {
       const VT = await axios.post(
@@ -254,7 +255,6 @@ const get_utilities = async (req, res) => {
     res.status(200).json({ data: response, error: false, message: 'Success', status: true });
   } catch (error) {
     res.status(500).json({ error });
-
   }
 }
 
@@ -267,6 +267,35 @@ const getUtilsByPhone = async (req, res) => {
     res.status(200).json({ data: response, error: false, message: 'Success', status: true });
   } catch (error) {
     console.log({ error });
+  }
+}
+
+const getUtilsbyFilters = async (req, res) => {
+  const { phone, merchant_id, date_added } = req.body;
+
+  const dateAddedDate = new Date(date_added);
+
+  const tenSecondsAgo = subSeconds(dateAddedDate, 30)
+  const tenSecondsLater = addSeconds(dateAddedDate, 30)
+
+  console.log({date_added, dateAddedDate, tenSecondsAgo, tenSecondsLater});
+
+  const less = format(tenSecondsAgo, 'yyyy-MM-dd HH:mm:ss');
+  const add = format(tenSecondsLater, 'yyyy-MM-dd HH:mm:ss');
+  try {
+    const response = await UTILITIES.findAll({
+      where: {
+        phone, merchant_id, createdAt: {
+          // [Op.lt] : dateAddedDate
+          [Op.between]: [tenSecondsAgo, tenSecondsLater],
+        },
+      }
+    });
+
+    res.status(200).json({ data: response, error: false, message: 'Success', status: true });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
   }
 }
 
@@ -283,5 +312,6 @@ module.exports = {
   query_status,
   get_utilities,
   get_flutterwave_bills_categories,
-  getUtilsByPhone
+  getUtilsByPhone,
+  getUtilsbyFilters
 };
