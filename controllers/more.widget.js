@@ -271,28 +271,38 @@ const getUtilsByPhone = async (req, res) => {
 }
 
 const getUtilsbyFilters = async (req, res) => {
-  const { phone, merchant_id, date_added } = req.body;
+  const { amount, merchant_id, date_added, transaction_ref } = req.body;
+
+  console.log(transaction_ref)
 
   const dateAddedDate = new Date(date_added);
 
   const tenSecondsAgo = subSeconds(dateAddedDate, 30)
   const tenSecondsLater = addSeconds(dateAddedDate, 30)
 
-  console.log({date_added, dateAddedDate, tenSecondsAgo, tenSecondsLater});
-
   const less = format(tenSecondsAgo, 'yyyy-MM-dd HH:mm:ss');
   const add = format(tenSecondsLater, 'yyyy-MM-dd HH:mm:ss');
   try {
-    const response = await UTILITIES.findAll({
-      where: {
-        phone, merchant_id, createdAt: {
-          // [Op.lt] : dateAddedDate
-          [Op.between]: [tenSecondsAgo, tenSecondsLater],
-        },
-      }
-    });
+    if (transaction_ref) {
+      const response = await UTILITIES.findAll({
+        where: {
+          transaction_ref
+        }
+      })
+      res.status(200).json({ data: response, error: false, message: 'Success', status: true });
 
-    res.status(200).json({ data: response, error: false, message: 'Success', status: true });
+    } else {
+      const response = await UTILITIES.findAll({
+        where: {
+          amount,
+          merchant_id,
+          createdAt: {
+            [Op.between]: [tenSecondsAgo, tenSecondsLater],
+          },
+        }
+      })
+      res.status(200).json({ data: response, error: false, message: 'Success', status: true });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
