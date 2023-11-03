@@ -33,6 +33,38 @@ const generateRequestId = () => {
   return `${y}${m}${d}${h}${min}${Math.random().toString(36).slice(2)}`;
 };
 
+const rerunAirtime = async (req, res) => {
+  const { serviceID, amount, phone, source, merchant_id, narration, account_number } = req.body;
+
+  try {
+    const VT = await axios.post(
+      `${LIVE_URL}`,
+      {
+        request_id: generateRequestId(),
+        serviceID,
+        amount,
+        phone,
+      },
+      { auth: { username, password } }
+    );
+
+    if (VT.data.content.errors) {
+      return res.status(400).json({ errors: VT?.data?.content?.errors, status: false, error: true, message: 'Error' })
+    }
+
+    let content = VT?.data?.content?.transactions;
+    const db_data = await UTILITIES.create({
+      phone, amount, status: content?.status || 'N/A', response_description: VT?.data?.response_description, requestId: VT?.data?.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id,
+    })
+    res.status(200).json({ data: VT.data.content, status: true, db_data });
+
+  } catch (error) {
+    console.log(error);
+    console.log(error?.response?.data);
+    res.status(500).json({ error: error?.response?.data, status: false });
+  }
+}
+
 const airtime = async (req, res) => {
   const { serviceID, amount, phone, source, merchant_id, narration, account_number } = req.body;
   try {
@@ -323,5 +355,6 @@ module.exports = {
   get_utilities,
   get_flutterwave_bills_categories,
   getUtilsByPhone,
-  getUtilsbyFilters
+  getUtilsbyFilters,
+  rerunAirtime
 };
