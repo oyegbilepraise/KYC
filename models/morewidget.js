@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     flw_ref: { type: DataTypes.STRING, required: true },
     transaction_ref: { type: DataTypes.STRING, required: true },
     provider: { type: DataTypes.STRING },
+    bye_power_token: { type: DataTypes.STRING },
   });
   return UTILITIES;
 };
