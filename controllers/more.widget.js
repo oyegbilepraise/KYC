@@ -134,6 +134,42 @@ const international = async (req, res) => {
   }
 }
 
+const rerun_data_subscripton = async (req, res) => {
+  const { serviceID, amount, phone, billersCode, variation_code, source, merchant_id, narration, account_number } = req.body;
+  try {
+    const VT = await axios.post(
+      `${LIVE_URL}`,
+      {
+        request_id: generateRequestId(),
+        serviceID,
+        amount,
+        phone,
+        billersCode,
+        variation_code,
+      },
+      { auth: { username, password } }
+    );
+
+    res.json(VT.data)
+    // const chargeWallet = await axios.post('https://wema.creditclan.com/withdraw/funds', { amount, merchant_id, account_number, narration });
+    // if (chargeWallet?.data?.status) {
+    //   if (VT.data.content.errors) {
+    //     return res.status(400).json({ errors: VT?.data?.content?.errors, status: false, error: true, message: 'Error' })
+    //   }
+    //   let content = VT?.data?.content?.transactions
+    //   const db_data = await UTILITIES.create({
+    //     phone, amount, status: content?.status || 'N/A', response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
+    //   })
+    //   res.status(200).json({ data: VT.data, status: true, db_data });
+    // } else {
+    //   res.status(400).json({ message: 'Error' })
+    // }
+  } catch (error) {
+    console.log({ error });
+    res.status(500).json({ error: error?.response?.data, status: false });
+  }
+};
+
 const data_subscripton = async (req, res) => {
   const { serviceID, amount, phone, billersCode, variation_code, source, merchant_id, narration, account_number } = req.body;
   try {
@@ -341,6 +377,15 @@ const getUtilsbyFilters = async (req, res) => {
   }
 }
 
+const saveUtils = async (req, res) => {
+  try {
+    const db_data = await UTILITIES.create({ ...req.body })
+    res.status(200).json({ data: db_data, status: true });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+}
+
 module.exports = {
   airtime,
   data_variation_codes,
@@ -356,5 +401,7 @@ module.exports = {
   get_flutterwave_bills_categories,
   getUtilsByPhone,
   getUtilsbyFilters,
-  rerunAirtime
+  rerunAirtime,
+  rerun_data_subscripton,
+  saveUtils
 };

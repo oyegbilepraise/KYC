@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     merchant_id: { type: DataTypes.STRING, required: false },
     flw_ref: { type: DataTypes.STRING, required: true },
     transaction_ref: { type: DataTypes.STRING, required: true },
+    provider: { type: DataTypes.STRING },
   });
   return UTILITIES;
 };
