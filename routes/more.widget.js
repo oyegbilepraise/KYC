@@ -18,5 +18,6 @@ router.get('/get_flutterwave_bills_categories', moreController.get_flutterwave_b
 router.post('/getUtilsByPhone', moreController.getUtilsByPhone);
 router.post('/getUtilsbyFilters', moreController.getUtilsbyFilters);
 router.post('/saveUtils', moreController.saveUtils);
+router.get('/balance', moreController.balance);
 
 module.exports = router;

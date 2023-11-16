@@ -386,6 +386,23 @@ const saveUtils = async (req, res) => {
   }
 }
 
+const balance = async (req, res) => {
+  try {
+    const VT = await axios.get(
+      `https://vtpass.com/api/balance`,
+      { auth: { username, password } }
+
+      ); 
+
+
+      res.json({data: VT.data?.contents, error: false, message: 'Success'});
+  
+  } catch (error) {
+    console.log(error?.response?.data);
+    // console.log({ error });
+  }
+}
+
 module.exports = {
   airtime,
   data_variation_codes,
@@ -403,5 +420,6 @@ module.exports = {
   getUtilsbyFilters,
   rerunAirtime,
   rerun_data_subscripton,
-  saveUtils
+  saveUtils,
+  balance
 };
