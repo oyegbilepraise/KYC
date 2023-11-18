@@ -341,18 +341,14 @@ const getUtilsByPhone = async (req, res) => {
 const getUtilsbyFilters = async (req, res) => {
   const { amount, merchant_id, date_added, transaction_ref } = req.body;
 
-  console.log(transaction_ref)
-
   const dateAddedDate = new Date(date_added);
-
+  
   const tenSecondsAgo = subSeconds(dateAddedDate, 30)
   const tenSecondsLater = addSeconds(dateAddedDate, 30)
 
-  const less = format(tenSecondsAgo, 'yyyy-MM-dd HH:mm:ss');
-  const add = format(tenSecondsLater, 'yyyy-MM-dd HH:mm:ss');
   try {
     if (transaction_ref) {
-      const response = await UTILITIES.findAll({
+      const response = await UTILITIES.findOne({
         where: {
           transaction_ref
         }
@@ -369,7 +365,7 @@ const getUtilsbyFilters = async (req, res) => {
           },
         }
       })
-      res.status(200).json({ data: response, error: false, message: 'Success', status: true });
+      res.status(200).json({ data: response[0] || {}, error: false, message: 'Success', status: true });
     }
   } catch (error) {
     console.log(error);
