@@ -383,7 +383,6 @@ module.exports = {
   renew_catbletv_sub,
   verify_meter_number,
   renew_meter_subscription,
-  international,
   query_status,
   get_utilities,
   get_flutterwave_bills_categories,
