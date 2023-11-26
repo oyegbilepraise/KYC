@@ -44,8 +44,6 @@ const callOnboardMerchant = async (response, phone, provider, channelId) => {
 const kyc = async (req, res) => {
   let { phone, response, provider, channelId } = req.body;
 
-  console.log(response);
-  
   let message;
   let trimmed_res = response.trim().toLowerCase();
   phone = "0" + phone.substr(-10);
