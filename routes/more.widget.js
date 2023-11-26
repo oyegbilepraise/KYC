@@ -3,7 +3,6 @@ const router = require("express").Router();
 
 router.post("/get_airtime", moreController.airtime);
 router.post("/get_airtime_rerun", moreController.rerunAirtime);
-router.post("/airtime/international", moreController.international);
 router.post("/data_variation_code", moreController.data_variation_codes);
 router.post("/get_data_subscription", moreController.data_subscripton);
 router.post("/rerun_data_subscripton", moreController.rerun_data_subscripton);

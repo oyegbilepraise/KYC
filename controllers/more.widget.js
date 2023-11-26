@@ -109,31 +109,6 @@ const airtime = async (req, res) => {
   }
 };
 
-// const international = async (req, res) => {
-//   try {
-//     const { serviceID, amount, phone, billersCode, variation_code, operator_id, country_code, product_type_id, email } = req.body;
-//     const VT = await axios.post(
-//       `${LIVE_URL}`,
-//       {
-//         request_id: generateRequestId(),
-//         serviceID,
-//         amount,
-//         phone,
-//         billersCode,
-//         variation_code,
-//         operator_id,
-//         country_code,
-//         product_type_id,
-//         email
-//       },
-//       { auth: { username, password } }
-//     );
-//     res.status(200).json({ data: VT.data, status: true });
-//   } catch (error) {
-//     res.status(500).json({ error, status: false });
-//   }
-// }
-
 const rerun_data_subscripton = async (req, res) => {
   const { serviceID, amount, phone, billersCode, variation_code, source, merchant_id, narration, account_number } = req.body;
   try {
