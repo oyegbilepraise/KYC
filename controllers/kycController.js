@@ -11,7 +11,6 @@ let stage = 0;
 const callClaimMerchant = async (response, phone, provider, channelId) => {
   try {
     const res = await axios.post('https://wasapnodeserver.herokuapp.com/claim_merchant', { response, phoneNumber: phone, provider, channelId, source: 'field' });
-
     return res.data ?? null;
   } catch (error) {
     console.log(error);
@@ -22,7 +21,6 @@ const callClaimMerchant = async (response, phone, provider, channelId) => {
 const callBookCredit = async (response, phone, provider, channelId) => {
   try {
     const res = await axios.post('https://wasapnodeserver.herokuapp.com/se_statement', { phoneNumber: phone, response, provider, channelId });
-
     return res.data ?? null;
   } catch (error) {
     console.log(error);
@@ -33,7 +31,6 @@ const callBookCredit = async (response, phone, provider, channelId) => {
 const callOnboardMerchant = async (response, phone, provider, channelId) => {
   try {
     const res = await axios.post('https://wasapnodeserver.herokuapp.com/onboard_merchant', { phoneNumber: phone, response, provider, channelId });
-
     return res.data ?? null;
   } catch (error) {
     console.log(error);
@@ -55,7 +52,8 @@ const kyc = async (req, res) => {
     { id: "report-card", title: "Report Card" },
     { id: 'b-k', title: 'Book Credit' },
     { id: 'o-m', title: 'Onboard Merchant' },
-    { id: 'r-l', title: 'Generate Referral Link' }
+    { id: 'r-l', title: 'Generate Referral Link' },
+    { id: 'm-otp', title: 'Master OTP' },
   ]
 
   let [starting, created] = await KYC.findOrCreate({
@@ -139,6 +137,12 @@ const kyc = async (req, res) => {
         const claim = await callOnboardMerchant('merchant', phone, provider, channelId);
         message = claim.message;
         await KYC.update({ step: 1, stage: 6 }, { where: { id: starting.id } });
+      } else if (response === 'm-otp'){
+        const claim = await axios.get(`https://wasapnodeserver.herokuapp.com/get_otp/${phone}`);
+        let messages = claim.data.message;
+        stage = 0; step = 0;
+        await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
+        message = await interactive.List(messages, list);
       }
     } else if (step === 2 && stage === 0) {
       let data = await request.getStaffDetails(response);
