@@ -125,17 +125,17 @@ const rerun_data_subscripton = async (req, res) => {
       { auth: { username, password } }
     );
 
-    res.json(VT.data)
+    // res.json(VT.data)
     // const chargeWallet = await axios.post('https://wema.creditclan.com/withdraw/funds', { amount, merchant_id, account_number, narration });
     // if (chargeWallet?.data?.status) {
-    //   if (VT.data.content.errors) {
-    //     return res.status(400).json({ errors: VT?.data?.content?.errors, status: false, error: true, message: 'Error' })
-    //   }
-    //   let content = VT?.data?.content?.transactions
-    //   const db_data = await UTILITIES.create({
-    //     phone, amount, status: content?.status || 'N/A', response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
-    //   })
-    //   res.status(200).json({ data: VT.data, status: true, db_data });
+    if (VT.data.content.errors) {
+      return res.status(400).json({ errors: VT?.data?.content?.errors, status: false, error: true, message: 'Error' })
+    }
+    let content = VT?.data?.content?.transactions
+    const db_data = await UTILITIES.create({
+      phone, amount, status: content?.status || 'N/A', response_description: VT.data.response_description, requestId: VT.data.requestId, product_name: content?.product_name, transactionId: content?.transactionId, type: content?.type || serviceID, source, merchant_id
+    })
+    res.status(200).json({ data: VT.data, status: true, db_data });
     // } else {
     //   res.status(400).json({ message: 'Error' })
     // }
@@ -317,7 +317,7 @@ const getUtilsbyFilters = async (req, res) => {
   const { amount, merchant_id, date_added, transaction_ref } = req.body;
 
   const dateAddedDate = new Date(date_added);
-  
+
   const tenSecondsAgo = subSeconds(dateAddedDate, 30)
   const tenSecondsLater = addSeconds(dateAddedDate, 30)
 
@@ -363,11 +363,11 @@ const balance = async (req, res) => {
       `https://vtpass.com/api/balance`,
       { auth: { username, password } }
 
-      ); 
+    );
 
 
-      res.json({data: VT.data?.contents, error: false, message: 'Success'});
-  
+    res.json({ data: VT.data?.contents, error: false, message: 'Success' });
+
   } catch (error) {
     console.log(error?.response?.data);
     // console.log({ error });
