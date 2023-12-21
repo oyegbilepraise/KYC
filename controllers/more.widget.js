@@ -383,9 +383,9 @@ const get_all_canrecharge = async (req, res) => {
 }
 
 const update_canrecharge = async (req, res) => {
-  const { status } = req.body;
+  const { status, id } = req.body;
   try {
-    const resi = UTILITIES.update({ can_recharge: status }, { where: { can_recharge: false } });
+    const resi = UTILITIES.update({ can_recharge: status }, { where: { id } });
     res.json({ data: resi, error: false, message: 'Success', status: true });
 
   } catch (error) {
