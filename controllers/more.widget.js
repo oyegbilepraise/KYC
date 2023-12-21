@@ -364,13 +364,32 @@ const balance = async (req, res) => {
       { auth: { username, password } }
 
     );
-
-
     res.json({ data: VT.data?.contents, error: false, message: 'Success' });
 
   } catch (error) {
     console.log(error?.response?.data);
     // console.log({ error });
+  }
+}
+
+const get_all_canrecharge = async (req, res) => {
+  try {
+    const resi = UTILITIES.findAll({ where: { can_recharge: false } });
+    res.json({ data: resi, error: false, message: 'Success', status: true });
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const update_canrecharge = async (req, res) => {
+  const { status } = req.body;
+  try {
+    const resi = UTILITIES.update({ can_recharge: status }, { where: { can_recharge: false } });
+    res.json({ data: resi, error: false, message: 'Success', status: true });
+
+  } catch (error) {
+    console.log(error);
   }
 }
 
@@ -391,5 +410,7 @@ module.exports = {
   rerunAirtime,
   rerun_data_subscripton,
   saveUtils,
-  balance
+  balance,
+  get_all_canrecharge,
+  update_canrecharge
 };

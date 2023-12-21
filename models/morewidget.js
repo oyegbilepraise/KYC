@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     transaction_ref: { type: DataTypes.STRING, required: true },
     provider: { type: DataTypes.STRING },
     bye_power_token: { type: DataTypes.STRING },
+    bye_power_reference: { type: DataTypes.STRING },
+    can_recharge: { type: DataTypes.BOOLEAN, defaultValue: true },
   });
   return UTILITIES;
 };

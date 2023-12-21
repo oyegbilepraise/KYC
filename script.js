@@ -13,19 +13,18 @@ const run = async () => {
     .on('end', async () => {
       for (let i = 0; i < results.length; i++) {
         try {
-          const res = await axios.post(`https://creditclan-kycs.herokuapp.com/api/more-widget/rerun_data_subscripton`,
+          const res = await axios.post(`https://creditclan-kycs.herokuapp.com/api/more-widget/get_airtime_rerun`,
             {
-              "serviceID": "mtn-data",
-              "amount": "1000",
+              "serviceID": "mtn",
+              "amount": "1500",
               "phone": results[i].NUMBER,
-              "billersCode": results[i].NUMBER,
-              "variation_code": "mtn-1200mb-1000",
-              "source": "Office CUG"
+              "source": "Office CUG Top-up",
+              "merchant_id": "00000"
             })
 
-          if (res?.data?.status) {
-            console.log(`Done - ${results[i].NUMBER}`);
-          }
+          // if (res?.data?.status) {
+          console.log(`Done - ${results[i].NUMBER}`);
+          // }
         } catch (error) {
           failedResult.push(results[i]);
           console.log(`failed - ${results[i].NUMBER}`);

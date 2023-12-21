@@ -18,5 +18,7 @@ router.post('/getUtilsByPhone', moreController.getUtilsByPhone);
 router.post('/getUtilsbyFilters', moreController.getUtilsbyFilters);
 router.post('/saveUtils', moreController.saveUtils);
 router.get('/balance', moreController.balance);
+router.get('/get_all_canrecharge', moreController.get_all_canrecharge);
+router.post('/update_canrecharge', moreController.update_canrecharge);
 
 module.exports = router;
