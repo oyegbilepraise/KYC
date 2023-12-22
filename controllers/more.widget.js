@@ -374,9 +374,8 @@ const balance = async (req, res) => {
 
 const get_all_canrecharge = async (req, res) => {
   try {
-    const resi = UTILITIES.findAll({ where: { can_recharge: false } });
+    const resi = await UTILITIES.findAll({ where: { can_recharge: false } });
     res.json({ data: resi, error: false, message: 'Success', status: true });
-
   } catch (error) {
     console.log(error);
   }
@@ -385,9 +384,8 @@ const get_all_canrecharge = async (req, res) => {
 const update_canrecharge = async (req, res) => {
   const { status, id } = req.body;
   try {
-    const resi = UTILITIES.update({ can_recharge: status }, { where: { id } });
+    const resi = await UTILITIES.update({ can_recharge: status }, { where: { id } });
     res.json({ data: resi, error: false, message: 'Success', status: true });
-
   } catch (error) {
     console.log(error);
   }
