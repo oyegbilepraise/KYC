@@ -9,7 +9,7 @@ var corsOptions = {
   origin: "*",
 };
 
-// middlewaress
+// middlewares
 
 app.use(cors(corsOptions));
 

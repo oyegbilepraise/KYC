@@ -16,15 +16,13 @@ const run = async () => {
           const res = await axios.post(`https://creditclan-kycs.herokuapp.com/api/more-widget/get_airtime_rerun`,
             {
               "serviceID": "mtn",
-              "amount": "1500",
+              "amount": '5000',
               "phone": results[i].NUMBER,
               "source": "Office CUG Top-up",
               "merchant_id": "00000"
             })
 
-          // if (res?.data?.status) {
-          console.log(`Done - ${results[i].NUMBER}`);
-          // }
+          console.log(`Done - ${results[i].NUMBER} - ${results[i].AMOUNT}`);
         } catch (error) {
           failedResult.push(results[i]);
           console.log(`failed - ${results[i].NUMBER}`);
