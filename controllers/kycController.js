@@ -224,7 +224,7 @@ const kyc = async (req, res) => {
         message = await interactive.List(messages, list);
       } else if (response === "c-bvn") {
         const resi = await getCustomerPhoneByBvn(phone);
-        message = resi;
+        message = resi.message;
       }
     } else if (step === 2 && stage === 0) {
       let data = await request.getStaffDetails(response);
