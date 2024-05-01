@@ -47,18 +47,17 @@ const callOnboardMerchant = async (response, phone, provider, channelId) => {
   }
 };
 
-const getCustomerPhoneByBvn = async (phone) => {
+const getCustomerPhoneByBvn = async (phone, response) => {
   try {
     const res = await axios.post(
       "https://wasapnodeserver.herokuapp.com/confirm_data",
       {
         phoneNumber: phone,
-        response: "confirmation",
+        response,
         provider: "messagebird",
         channelId: "b98cd5f8-0c9b-4512-9512-c842ff813f48",
       }
     );
-
     return res?.data;
   } catch (error) {
     console.log(error?.response?.data);
@@ -223,8 +222,9 @@ const kyc = async (req, res) => {
         await KYC.update({ step: 0, stage: 0 }, { where: { id: starting.id } });
         message = await interactive.List(messages, list);
       } else if (response === "c-bvn") {
-        const resi = await getCustomerPhoneByBvn(phone);
+        const resi = await getCustomerPhoneByBvn(phone, 'confirmation');
         message = resi.message;
+        await KYC.update({ step: 1, stage: 7 }, { where: { id: starting.id } });
       }
     } else if (step === 2 && stage === 0) {
       let data = await request.getStaffDetails(response);
@@ -340,9 +340,9 @@ const kyc = async (req, res) => {
       } else {
         message = claim.message;
       }
-      // } else if (step === 1 && stage === 7) {
-      //   const phone = await getCustomerPhoneByBvn(phone);
-      //   console.log({ phone });
+    } else if (step === 1 && stage === 7) {
+      const resi = await getCustomerPhoneByBvn(phone, response);
+      message = resi.message;
     }
     return res.status(200).json({ message });
   } catch (error) {
