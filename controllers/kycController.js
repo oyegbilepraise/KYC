@@ -11,7 +11,7 @@ let stage = 0;
 const callClaimMerchant = async (response, phone, provider, channelId) => {
   try {
     const res = await axios.post(
-      "https://wasapnodeserver.herokuapp.com/claim_merchant",
+      "https://awsnodeserver.creditclan.com/claim_merchant",
       { response, phoneNumber: phone, provider, channelId, source: "field" }
     );
     return res.data ?? null;
@@ -24,7 +24,7 @@ const callClaimMerchant = async (response, phone, provider, channelId) => {
 const callBookCredit = async (response, phone, provider, channelId) => {
   try {
     const res = await axios.post(
-      "https://wasapnodeserver.herokuapp.com/se_statement",
+      "https://awsnodeserver.creditclan.com/se_statement",
       { phoneNumber: phone, response, provider, channelId }
     );
     return res.data ?? null;
@@ -37,7 +37,7 @@ const callBookCredit = async (response, phone, provider, channelId) => {
 const callOnboardMerchant = async (response, phone, provider, channelId) => {
   try {
     const res = await axios.post(
-      "https://wasapnodeserver.herokuapp.com/onboard_merchant",
+      "https://awsnodeserver.creditclan.com/onboard_merchant",
       { phoneNumber: phone, response, provider, channelId }
     );
     return res.data ?? null;
@@ -50,7 +50,7 @@ const callOnboardMerchant = async (response, phone, provider, channelId) => {
 const getCustomerPhoneByBvn = async (phone, response) => {
   try {
     const res = await axios.post(
-      "https://wasapnodeserver.herokuapp.com/confirm_data",
+      "https://awsnodeserver.creditclan.com/confirm_data",
       {
         phoneNumber: phone,
         response,
@@ -214,7 +214,7 @@ const kyc = async (req, res) => {
         await KYC.update({ step: 1, stage: 6 }, { where: { id: starting.id } });
       } else if (response === "m-otp") {
         const claim = await axios.get(
-          `https://wasapnodeserver.herokuapp.com/get_otp/${phone}`
+          `https://awsnodeserver.creditclan.com/get_otp/${phone}`
         );
         let messages = claim.data.message;
         stage = 0;
